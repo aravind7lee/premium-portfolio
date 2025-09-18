@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   Theme variables & overrides
+   ========================= */
+
+/* default (dark theme) variables */
+:root {
+  --color-text: #f9fafb;
+  --color-text-rgb: 249, 250, 251;
+  --bg-from: #05060a;
+  --bg-via: #071122;
+  --bg-to: #041018;
+  --panel-bg: rgba(255, 255, 255, 0.03);
+  --panel-border: rgba(255, 255, 255, 0.04);
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-2: rgba(255, 255, 255, 0.02);
+  --accent: #8e37eb;
+}
+
+/* light theme overrides (when ThemeProvider sets data-theme="light") */
+[data-theme="light"] {
+  --color-text: #0b1220;
+  --color-text-rgb: 11, 18, 32;
+  --bg-from: #f9fafb;
+  --bg-via: #ffffff;
+  --bg-to: #f0f4f8;
+  --panel-bg: rgba(0, 0, 0, 0.04);
+  --panel-border: rgba(0, 0, 0, 0.06);
+  --glass: rgba(0, 0, 0, 0.04);
+  --glass-2: rgba(0, 0, 0, 0.02);
+  --accent: #8e37eb;
+}
+
+/* body background uses CSS variables for full-site gradient that flips with theme */
+html,
+body {
+  height: 100%;
+}
+body {
+  color: rgb(var(--color-text-rgb));
+  background-image: linear-gradient(
+    to bottom,
+    var(--bg-from),
+    var(--bg-via),
+    var(--bg-to)
+  );
+  background-attachment: fixed;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+/* =========================
+   Re-map common Tailwind utilities to variables
+   so components that used text-white / bg-white/6 etc become theme-aware
+   (we place these overrides after Tailwind so they take precedence)
+   ========================= */
+
+/* All classes that contain 'text-white' (text-white, text-white/70 etc) */
+.text-white,
+[class*="text-white"] {
+  /* primary text color (switches per theme) */
+  color: rgb(var(--color-text-rgb)) !important;
+}
+
+/* explicit opacity variants used in your project */
+.text-white\/70 {
+  color: rgba(var(--color-text-rgb), 0.7) !important;
+}
+.text-white\/60 {
+  color: rgba(var(--color-text-rgb), 0.6) !important;
+}
+.text-white\/80 {
+  color: rgba(var(--color-text-rgb), 0.8) !important;
+}
+
+/* Background utility overrides used in navbar & cards (bg-white/6 etc) */
+.bg-white\/6 {
+  background-color: rgba(var(--color-text-rgb), 0.06) !important;
+}
+.bg-white\/5 {
+  background-color: rgba(var(--color-text-rgb), 0.05) !important;
+}
+.bg-white\/3 {
+  background-color: rgba(var(--color-text-rgb), 0.03) !important;
+}
+
+/* Hover variants (escape colon and slash) */
+.hover\:bg-white\/3:hover {
+  background-color: rgba(var(--color-text-rgb), 0.03) !important;
+}
+.hover\:bg-white\/5:hover {
+  background-color: rgba(var(--color-text-rgb), 0.05) !important;
+}
+
+/* Glass class — map to panel background & border variables */
+.glass {
+  background: linear-gradient(
+    180deg,
+    var(--panel-bg),
+    rgba(255, 255, 255, 0.01)
+  );
+  background-color: var(--panel-bg) !important;
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--panel-border) !important;
+}
+
+/* 'glass-effect' if you used it */
+.glass-effect {
+  background: linear-gradient(
+    180deg,
+    var(--panel-bg),
+    rgba(255, 255, 255, 0.01)
+  );
+  background-color: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Buttons that have text-black for contrast (primary CTA) */
+.text-black,
+[class*="text-black"] {
+  color: #0b1220 !important;
+}
+
+/* Make icons inherit the proper color */
+svg,
+svg * {
+  transition: color 220ms ease;
+  color: inherit;
+}
+
+/* Focus ring */
+:focus {
+  outline: 2px solid rgba(142, 55, 235, 0.6);
+  outline-offset: 2px;
+}
+
+/* gradient layers (kept your existing definitions) */
+.gradient-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.gradient-1 {
+  filter: blur(160px);
+  background: radial-gradient(
+    closest-side at 10% 20%,
+    rgba(124, 58, 237, 0.18),
+    transparent 20%
+  );
+}
+.gradient-2 {
+  filter: blur(120px);
+  background: radial-gradient(
+    closest-side at 85% 70%,
+    rgba(6, 182, 212, 0.12),
+    transparent 20%
+  );
+}
+
+/* card tilt helpers */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 350ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 250ms;
+  will-change: transform;
+}
+
+/* Prefer-reduced-motion: minimize costly animations on mobile / accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .tilt-card {
+    transition: none !important;
+  }
+}
+
+/* floating icon */
+.floating-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  box-shadow: 0 8px 30px rgba(6, 182, 212, 0.12),
+    inset 0 -6px 18px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* theme transition helper (applied briefly by ThemeProvider) */
+html.theme-transition,
+body.theme-transition {
+  transition: background-color 300ms ease-in-out, color 300ms ease-in-out,
+    border-color 300ms ease-in-out, box-shadow 300ms ease-in-out;
+}
+
+/* small helper for the toggle's glowing accent highlight */
+.theme-accent {
+  --accent: #8e37eb;
+}
