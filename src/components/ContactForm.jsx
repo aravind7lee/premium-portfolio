@@ -7,9 +7,7 @@ import { useTheme } from "../context/ThemeProvider";
 
 /**
  * Responsive, mobile-first, accessible ContactForm.
- * Submits to Web3Forms directly (no Netlify).
- *
- * Save as: src/components/ContactForm.jsx
+ * Submits to Web3Forms directly.
  */
 
 const DEST_EMAIL = "aravindrajaa03@gmail.com";
@@ -24,7 +22,7 @@ export default function ContactForm() {
   const textareaRef = React.useRef(null);
   const { isDark } = useTheme();
 
-  // auto-resize textarea for better mobile experience
+  // auto-resize textarea
   React.useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -155,42 +153,41 @@ export default function ContactForm() {
     </svg>
   );
 
-  // Theme-aware styles
+  // THE CHANGE: make the form itself the grey box (light/dark aware) and remove outer border
   const formStyles = {
+    // Light theme: neutral grey background; Dark theme: subtle translucent panel
     background: isDark
-      ? "linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06))"
-      : "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(245,245,245,0.9))",
+      ? "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))"
+      : "#f3f4f6", // tailwind gray-100 / nice soft grey
+    // remove visible border (user requested no grey border around the form)
+    border: "none",
+    color: isDark ? "#e6eefb" : "#111827",
+    // keep a subtle shadow for depth
+    boxShadow: isDark
+      ? "0 8px 30px -10px rgba(0,0,0,0.6)"
+      : "0 6px 20px -6px rgba(16,24,40,0.06)",
+  };
+
+  // inputs keep subtle inner borders so fields are still visible
+  const inputStyles = {
+    background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.03)",
     border: isDark
       ? "1px solid rgba(255,255,255,0.06)"
       : "1px solid rgba(0,0,0,0.08)",
     color: isDark ? "#ffffff" : "#111827",
-    boxShadow: isDark
-      ? "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)"
-      : "0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05)",
-  };
-
-  const inputStyles = {
-    background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-    border: isDark
-      ? "1px solid rgba(255,255,255,0.08)"
-      : "1px solid rgba(0,0,0,0.1)",
-    color: isDark ? "#ffffff" : "#111827",
     placeholderColor: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
     focusBorder: isDark
-      ? "1px solid rgba(255,255,255,0.3)"
+      ? "1px solid rgba(255,255,255,0.24)"
       : "1px solid rgba(59,130,246,0.5)",
   };
 
   const buttonStyles = {
-    background: isDark
-      ? "linear-gradient(to right, #8B5CF6, #06B6D4)"
-      : "linear-gradient(to right, #8B5CF6, #06B6D4)",
+    background:
+      "linear-gradient(to right, #8B5CF6, #06B6D4)", // keeps the accent gradient
     text: isDark ? "#000000" : "#FFFFFF",
     glass: {
-      background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)",
-      border: isDark
-        ? "1px solid rgba(255,255,255,0.08)"
-        : "1px solid rgba(0,0,0,0.08)",
+      background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+      border: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.08)",
       color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.8)",
     },
   };
@@ -200,12 +197,11 @@ export default function ContactForm() {
       onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative w-full max-w-3xl mx-auto p-5 sm:p-6 md:p-8 rounded-2xl backdrop-blur-md"
+      className="relative w-full max-w-3xl mx-auto p-6 md:p-8 rounded-2xl"
       style={formStyles}
       aria-label="Contact form"
       noValidate
     >
-      {/* No Netlify fields — direct client request to Web3Forms */}
       {/* honeypot */}
       <input
         type="text"
@@ -220,7 +216,8 @@ export default function ContactForm() {
         <div
           className="absolute inset-0 z-40 rounded-2xl flex items-center justify-center"
           style={{
-            background: isDark ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.7)",
+            background: isDark ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.7)",
+            borderRadius: 18,
           }}
         >
           <div className="flex flex-col items-center gap-3">
@@ -251,18 +248,18 @@ export default function ContactForm() {
             color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)",
           }}
         >
-          Have a project, job offer or simply want to say hi? Drop a message —
-          I’ll reply as soon as possible.
+          Have a project, job offer or simply want to say hi? Drop a message — I’ll reply as soon as
+          possible.
         </p>
       </div>
 
-      {/* Fields: mobile-first single column -> md two-column */}
+      {/* Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-5">
         <label className="flex flex-col text-sm">
           <span
             className="mb-2 flex items-center gap-2"
             style={{
-              color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+              color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.72)",
             }}
           >
             <FiUser /> Name
@@ -294,7 +291,7 @@ export default function ContactForm() {
           <span
             className="mb-2 flex items-center gap-2"
             style={{
-              color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+              color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.72)",
             }}
           >
             <FiMail /> Email
@@ -328,7 +325,7 @@ export default function ContactForm() {
           <span
             className="mb-2 flex items-center gap-2"
             style={{
-              color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+              color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.72)",
             }}
           >
             <FiTag /> Subject (optional)
@@ -360,7 +357,7 @@ export default function ContactForm() {
           <span
             className="mb-2"
             style={{
-              color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+              color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.72)",
             }}
           >
             Message
@@ -389,7 +386,7 @@ export default function ContactForm() {
         </label>
       </div>
 
-      {/* Actions: stack on mobile, inline on md+ */}
+      {/* Actions */}
       <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
         <Motion.button
           type="submit"

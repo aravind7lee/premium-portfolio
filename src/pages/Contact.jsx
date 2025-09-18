@@ -9,7 +9,6 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 /* ----------------------- Utilities ----------------------- */
 const cx = (...args) => args.filter(Boolean).join(" ");
 
-/* Safe matchMedia wrapper */
 function safeMatchMedia(query) {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
   try {
@@ -42,11 +41,9 @@ function useInView(ref, { threshold = 0.15, rootMargin = "0px 0px -10% 0px" } = 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // Always trigger whenever it enters (both up & down scrolls)
           if (entry.isIntersecting) {
             setInView(true);
           } else {
-            // Reset when leaving so it replays on next enter
             setInView(false);
           }
         });
@@ -85,7 +82,6 @@ function Reveal({
   const { saveData, effectiveType } = connectionInfo();
   const reduceMotion = hookPref || saveData || /2g|slow-2g/i.test(effectiveType);
 
-  // Animation presets
   const variants = {
     "fade-up": { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } },
     "fade-down": { hidden: { opacity: 0, y: -30 }, visible: { opacity: 1, y: 0 } },
@@ -164,11 +160,11 @@ export default function Contact() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           {/* Left: Contact form */}
           <Reveal variant="fade-up" delay={0.2}>
-            <section className="glass rounded-lg p-8 w-full h-full flex flex-col">
-              <div className="flex flex-col flex-1">
-                <ContactForm />
-              </div>
-            </section>
+            {/* NOTE: removed the extra outer "glass" container that previously wrapped the form.
+                ContactForm now renders the grey background itself. */}
+            <div className="w-full h-full">
+              <ContactForm />
+            </div>
           </Reveal>
 
           {/* Right: Details */}
