@@ -18,7 +18,11 @@ import Profile1 from "../assets/Profile1.jpg"; // ensure path is correct
  *  - rootMargin: rootMargin string for early/late reveal (default "0px 0px -10% 0px")
  *  - once: if true, reveal only once (we default to false so it replays)
  */
-function useScrollReveal({ threshold = 0.15, rootMargin = "0px 0px -10% 0px", once = false } = {}) {
+function useScrollReveal({
+  threshold = 0.15,
+  rootMargin = "0px 0px -10% 0px",
+  once = false,
+} = {}) {
   const ref = useRef(null);
   const reduce = usePrefersReducedMotion();
   const [visible, setVisible] = useState(reduce ? true : false);
@@ -78,7 +82,12 @@ const contentVariant = {
 
 const imageWrapVariant = {
   hidden: { opacity: 0, y: 28, scale: 0.99, willChange: "transform, opacity" },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease: "easeOut" } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
 };
 
 export default function Hero() {
@@ -86,21 +95,32 @@ export default function Hero() {
 
   // Two independent reveals: content column and profile-image column.
   // They replay on re-entry (once: false)
-  const [contentRef, contentVisible] = useScrollReveal({ threshold: 0.12, rootMargin: "0px 0px -18% 0px", once: false });
-  const [imageRef, imageVisible] = useScrollReveal({ threshold: 0.15, rootMargin: "0px 0px -20% 0px", once: false });
+  const [contentRef, contentVisible] = useScrollReveal({
+    threshold: 0.12,
+    rootMargin: "0px 0px -18% 0px",
+    once: false,
+  });
+  const [imageRef, imageVisible] = useScrollReveal({
+    threshold: 0.15,
+    rootMargin: "0px 0px -20% 0px",
+    once: false,
+  });
 
   // Mail setup (keeps your existing behavior)
   const EMAIL = "aravindrajaa03@gmail.com";
   const SUBJECT = "Inquiry from portfolio";
   const BODY = "";
-  const mailtoHref = `mailto:${EMAIL}?subject=${encodeURIComponent(SUBJECT)}&body=${encodeURIComponent(BODY)}`;
+  const mailtoHref = `mailto:${EMAIL}?subject=${encodeURIComponent(
+    SUBJECT
+  )}&body=${encodeURIComponent(BODY)}`;
   const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
     EMAIL
   )}&su=${encodeURIComponent(SUBJECT)}&body=${encodeURIComponent(BODY)}&tf=1`;
 
   const handleMailClick = useCallback(
     (e) => {
-      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button === 1) return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button === 1)
+        return;
       e.preventDefault();
 
       try {
@@ -155,7 +175,8 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg text-white/80 max-w-xl mx-auto md:mx-0">
-              I craft responsive, fast, and accessible web experiences. Polished micro-interactions and performance-first design that feel premium.
+               Crafting modern digital experiences with <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">React</span>, <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">Node.js</span>, and <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">TailwindCSS </span>
+         Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions
             </p>
 
             <div className="flex gap-4 items-center justify-center md:justify-start">
@@ -172,7 +193,10 @@ export default function Hero() {
             </div>
 
             <div className="mt-6">
-              <a href="#projects" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white">
+              <a
+                href="#projects"
+                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white"
+              >
                 <span className="animate-bounce">↓</span> Scroll to projects
               </a>
             </div>
@@ -191,7 +215,12 @@ export default function Hero() {
               <div className="absolute inset-0 rounded-2xl glass p-4 tilt-card shadow-2xl transform-gpu overflow-hidden">
                 {reduce ? (
                   // reduced motion: static img
-                  <img src={Profile1} alt="Aravind profile" loading="lazy" className="w-full h-full object-cover block" />
+                  <img
+                    src={Profile1}
+                    alt="Aravind profile"
+                    loading="lazy"
+                    className="w-full h-full object-cover block"
+                  />
                 ) : (
                   // normal: outer wrapper controlled by IntersectionObserver; inner img does a slow breathing animation while visible
                   <motion.img
@@ -201,9 +230,7 @@ export default function Hero() {
                     style={{ transformOrigin: "50% 50%" }}
                     // breathing: animate scale loop only when imageVisible
                     animate={
-                      imageVisible
-                        ? { scale: [1.02, 1.0, 1.02] }
-                        : { scale: 1 } // reset when not visible so it will animate again on re-entry
+                      imageVisible ? { scale: [1.02, 1.0, 1.02] } : { scale: 1 } // reset when not visible so it will animate again on re-entry
                     }
                     transition={
                       imageVisible
