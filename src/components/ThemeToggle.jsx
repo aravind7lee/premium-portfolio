@@ -1,50 +1,177 @@
 // src/components/ThemeToggle.jsx
-import React from 'react';
-import { motion } from 'framer-motion';
-import { FiSun, FiMoon } from 'react-icons/fi';
-import { useTheme } from '../context/ThemeProvider';
+import React, { useMemo, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { FiSun, FiMoon } from "react-icons/fi";
+import { useTheme } from "../context/ThemeProvider";
 
-/**
- * ThemeToggle (two-state)
- * - Default: light
- * - Click toggles between light <-> dark
- */
-export default function ThemeToggle({ className = '' }) {
+// Ultra-smooth theme toggle: GPU-accelerated, spring-based, no layout thrash
+function ThemeToggleImpl({ className = "" }) {
   const { theme, cycleTheme, isDark } = useTheme();
+  const prefersReduced = useReducedMotion();
 
-  // two-state knob X (same geometry as before)
-  const knobX = theme === 'dark' ? 28 : 0;
-  const Icon = theme === 'dark' ? FiMoon : FiSun;
+  // motion values avoid re-layout and re-render on every frame
+  const x = useMotionValue(isDark ? 28 : 0);
+  const xSpring = useSpring(x, {
+    stiffness: prefersReduced ? 1 : 780,
+    damping: prefersReduced ? 30 : 32,
+    mass: 0.9,
+  });
+  const rotate = useTransform(xSpring, [0, 28], [0, 180]);
+
+  // update target when theme changes (instant for reduced motion)
+  React.useEffect(() => {
+    if (prefersReduced) {
+      x.set(isDark ? 28 : 0);
+    } else {
+      x.set(isDark ? 28 : 0);
+    }
+  }, [isDark, prefersReduced, x]);
+
+  // Optimistic, snappy interaction
+  const isToggling = useRef(false);
+  const onToggle = () => {
+    if (isToggling.current) return;
+    isToggling.current = true;
+    // Optimistically animate the knob first for instant feel
+    x.set(isDark ? 0 : 28);
+    // Commit theme on next frame to avoid blocking
+    requestAnimationFrame(() => {
+      cycleTheme();
+      // allow another toggle after a short moment
+      setTimeout(() => (isToggling.current = false), 120);
+    });
+  };
+
+  const bg = useMemo(
+    () =>
+      isDark
+        ? "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))"
+        : "linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.03))",
+    [isDark]
+  );
 
   return (
     <button
-      onClick={() => cycleTheme()}
+      onClick={onToggle}
+      type="button"
       aria-label={`Toggle theme, current: ${theme}`}
+      aria-pressed={isDark}
+      role="switch"
       title={`Theme: ${theme}`}
       className={`inline-flex items-center ${className}`}
     >
       <div
         className="w-16 h-9 rounded-full p-1 cursor-pointer select-none relative"
         style={{
-          background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-          border: '1px solid rgba(255,255,255,0.06)'
+          background: bg,
+          border: "1px solid rgba(255,255,255,0.06)",
+          WebkitTapHighlightColor: "transparent",
+          willChange: "transform",
+          transform: "translateZ(0)",
         }}
       >
+        {/* Trail glow */}
+        {!prefersReduced && (
+          <motion.span
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: 999,
+              background: isDark
+                ? "radial-gradient(600px circle at 20% 50%, rgba(159,122,234,0.15), transparent 40%)"
+                : "radial-gradient(600px circle at 80% 50%, rgba(6,182,212,0.16), transparent 40%)",
+              filter: "blur(4px)",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
+          />
+        )}
+
+        {/* Knob */}
         <motion.div
-          layout
           initial={false}
-          animate={{ x: knobX }}
-          transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-          whileTap={{ scale: 0.96 }}
+          style={{ x: xSpring }}
+          whileTap={prefersReduced ? undefined : { scale: 0.97 }}
           className="w-7 h-7 rounded-full shadow-sm flex items-center justify-center absolute top-1 left-1"
-          style={{
-            background: isDark ? '#0b1220' : '#fff',
-            boxShadow: isDark ? '0 6px 18px rgba(142,55,235,0.12)' : '0 6px 18px rgba(0,0,0,0.08)'
-          }}
+          transition={
+            prefersReduced
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 820, damping: 28 }
+          }
+          animate={{ backgroundColor: isDark ? "#0b1220" : "#ffffff" }}
         >
-          <Icon style={{ color: isDark ? '#8E37EB' : '#111827' }} />
+          {/* Only one icon is mounted; crossfade/scale on switch */}
+          <AnimatePresence initial={false} mode="wait">
+            {isDark ? (
+              <motion.span
+                key="moon"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                initial={
+                  prefersReduced
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.9, rotate: -20 }
+                }
+                animate={
+                  prefersReduced
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 1, scale: 1, rotate: 0 }
+                }
+                exit={
+                  prefersReduced
+                    ? { opacity: 1 }
+                    : { opacity: 0, scale: 0.9, rotate: 20 }
+                }
+                transition={{ duration: prefersReduced ? 0 : 0.18 }}
+              >
+                <FiMoon size={16} color="#8E37EB" />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="sun"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  rotate,
+                }}
+                initial={
+                  prefersReduced
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.9, rotate: 20 }
+                }
+                animate={
+                  prefersReduced
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 1, scale: 1, rotate: 0 }
+                }
+                exit={
+                  prefersReduced
+                    ? { opacity: 1 }
+                    : { opacity: 0, scale: 0.9, rotate: -20 }
+                }
+                transition={{ duration: prefersReduced ? 0 : 0.18 }}
+              >
+                <FiSun size={16} color="#111827" />
+              </motion.span>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
     </button>
   );
 }
+
+const ThemeToggle = React.memo(ThemeToggleImpl);
+export default ThemeToggle;

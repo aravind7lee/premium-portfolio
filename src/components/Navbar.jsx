@@ -8,182 +8,202 @@ import React, {
 } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
+import {
+  motion,
+  AnimatePresence,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
+import Particles from "react-tsparticles";
+import { loadFull } from "tsparticles";
 import ThemeToggle from "./ThemeToggle";
 import { useTheme } from "../context/ThemeProvider";
 import logoLight from "../assets/logo.png";
 import logoDark from "../assets/logo_dark.png";
 
-/**
- * Navbar.jsx
- *
- * Goals:
- *  - Make theme toggling feel buttery-smooth (60fps) for the Navbar.
- *  - Use GPU-friendly properties (opacity / transform) and will-change hints.
- *  - Preload logo images to avoid flicker on theme change.
- *  - Keep DOM updates minimal; crossfade visuals instead of re-mounting when toggling.
- *
- * Tailwind utilities assumed:
- *  - motion-reduce utilities are available (Tailwind v2.2+ or configured).
- *  - transform-gpu (optional) available; otherwise transform still works.
- *
- * Notes:
- *  - This file intentionally avoids heavy JS animation libraries for the Navbar itself.
- *  - If your global theme toggle adds heavy effects (big backdrop-blurs across the page),
- *    you may still see a brief frame drop — those should be reduced globally. This Navbar
- *    code minimizes its own expensive work.
- */
-
-/* -------------------- Utility: prefersReducedMotion -------------------- */
+/* -------------------- Hook: prefersReducedMotion -------------------- */
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const handler = () => setReduced(mq.matches);
     handler();
-    if (mq.addEventListener) {
-      mq.addEventListener("change", handler);
-    } else {
-      // Safari fallback
-      mq.addListener(handler);
-    }
+    if (mq.addEventListener) mq.addEventListener("change", handler);
+    else mq.addListener(handler);
     return () => {
-      if (mq.removeEventListener) {
-        mq.removeEventListener("change", handler);
-      } else {
-        mq.removeListener(handler);
-      }
+      if (mq.removeEventListener) mq.removeEventListener("change", handler);
+      else mq.removeListener(handler);
     };
   }, []);
   return reduced;
 }
 
-/* -------------------- Logo: preloads and crossfades two images -------------------- */
+/* -------------------- Custom hook for scroll-reveal -------------------- */
+function useScrollReveal(options = {}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, {
+    once: false,
+    margin: "0px 0px -10% 0px",
+    ...options,
+  });
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  return { ref, isInView, prefersReducedMotion };
+}
+
+/* -------------------- ScrollReveal Component -------------------- */
+const ScrollReveal = ({
+  children,
+  variants = {},
+  className = "",
+  style = {},
+  as = "div",
+  revealOptions = {},
+  ...props
+}) => {
+  const { ref, isInView, prefersReducedMotion } =
+    useScrollReveal(revealOptions);
+
+  // Create motion component based on 'as' prop - FIXED: Use motion.create() instead of motion()
+  const MotionComponent = useMemo(() => {
+    if (typeof as === "string") {
+      return motion[as];
+    }
+    // If 'as' is a React component, create a motion wrapper using motion.create()
+    if (typeof motion.create === "function") {
+      return motion.create(as);
+    } else {
+      // Fallback for older versions of Framer Motion
+      return motion(as);
+    }
+  }, [as]);
+
+  const defaultVariants = {
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: prefersReducedMotion ? 0 : 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const mergedVariants = { ...defaultVariants, ...variants };
+
+  return (
+    <MotionComponent
+      ref={ref}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      variants={mergedVariants}
+      className={className}
+      style={style}
+      {...props}
+    >
+      {children}
+    </MotionComponent>
+  );
+};
+
+/* -------------------- Logo (crossfade) -------------------- */
 const Logo = React.memo(function Logo({ isDark }) {
   const preloadedRef = useRef(false);
-
   useEffect(() => {
-    // Preload both logos (only once). Preloading reduces flicker on toggle.
     if (!preloadedRef.current) {
-      [logoLight, logoDark].forEach((src) => {
-        const img = new Image();
-        img.src = src;
-        img.decoding = "async";
+      [logoLight, logoDark].forEach((s) => {
+        const i = new Image();
+        i.src = s;
+        i.decoding = "async";
       });
       preloadedRef.current = true;
     }
   }, []);
-
-  // Inline styles used for precise GPU hints (will-change & translateZ)
-  const sharedImgStyle = {
-    willChange: "opacity",
-    transform: "translateZ(0)",
-    imageRendering: "auto",
-  };
-
+  const shared = { willChange: "opacity", transform: "translateZ(0)" };
   return (
     <Link to="/" aria-label="Home" className="flex items-center gap-3">
       <span
         className="relative inline-block w-[120px] h-8 md:w-[160px] md:h-10 lg:w-[180px] lg:h-11"
-        aria-hidden="true"
+        aria-hidden
       >
-        {/* Light logo */}
         <img
           src={logoLight}
-          alt="Logo"
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          style={sharedImgStyle}
-          className={`absolute inset-0 w-full h-full object-contain pointer-events-none
-                      transition-opacity duration-200 ease-out motion-reduce:transition-none
-                      ${isDark ? "opacity-0" : "opacity-100"}`}
+          alt="logo"
+          style={shared}
+          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-200 ease-out ${
+            isDark ? "opacity-0" : "opacity-100"
+          }`}
         />
-
-        {/* Dark logo */}
         <img
           src={logoDark}
-          alt="Logo dark"
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          style={sharedImgStyle}
-          className={`absolute inset-0 w-full h-full object-contain pointer-events-none
-                      transition-opacity duration-200 ease-out motion-reduce:transition-none
-                      ${isDark ? "opacity-100" : "opacity-0"}`}
+          alt="logo dark"
+          style={shared}
+          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-200 ease-out ${
+            isDark ? "opacity-100" : "opacity-0"
+          }`}
         />
       </span>
-
       <span className="sr-only">Premium Portfolio</span>
     </Link>
   );
 });
 
-/* -------------------- NavLinks: memoized list (depends only on pathname) -------------------- */
-const NavLinks = React.memo(function NavLinks({ links, pathname }) {
-  return (
-    <>
-      {links.map((l) => {
-        const active = pathname === l.to;
-        return (
-          <Link
-            key={l.to}
-            to={l.to}
-            className={`px-3 py-2 rounded-md text-sm transition-colors duration-150 motion-reduce:transition-none
-                        ${
-                          active
-                            ? "bg-white/6 text-white dark:bg-white/10 dark:text-white"
-                            : "text-white hover:bg-white/3 dark:text-white/90 dark:hover:bg-white/8"
-                        }`}
-            aria-current={active ? "page" : undefined}
-          >
-            {l.label}
-          </Link>
-        );
-      })}
-    </>
-  );
-});
-
-/* -------------------- IconCrossfade: keeps both icons mounted and crossfades -------------------- */
+/* -------------------- IconCrossfade (animated) -------------------- */
 function IconCrossfade({ open, size = 20 }) {
-  // Use GPU-friendly properties and will-change
-  const commonClass =
-    "absolute inset-0 flex items-center justify-center transition-opacity transition-transform duration-180 ease-out motion-reduce:transition-none transform-gpu";
+  const common =
+    "absolute inset-0 flex items-center justify-center transform-gpu pointer-events-none";
+  const menuClass = `${common} transition-opacity duration-180 ${
+    open ? "opacity-0 scale-95" : "opacity-100 scale-100"
+  }`;
+  const xClass = `${common} transition-opacity duration-180 ${
+    open ? "opacity-100 scale-100" : "opacity-0 scale-95"
+  }`;
+  // small rotation when toggled (parent may rotate too)
   return (
     <span
-      className="relative inline-block"
-      style={{ width: size, height: size, willChange: "opacity, transform" }}
-      aria-hidden="true"
+      style={{
+        width: size,
+        height: size,
+        display: "inline-block",
+        position: "relative",
+      }}
+      aria-hidden
     >
-      <FiMenu
-        size={size}
-        className={
-          commonClass + (open ? " opacity-0 scale-95 pointer-events-none" : " opacity-100 scale-100")
-        }
-      />
-      <FiX
-        size={size}
-        className={
-          commonClass + (open ? " opacity-100 scale-100" : " opacity-0 scale-95 pointer-events-none")
-        }
-      />
+      <span className={menuClass}>
+        <FiMenu size={size} />
+      </span>
+      <span className={xClass}>
+        <FiX size={size} />
+      </span>
     </span>
   );
 }
 
-/* -------------------- Navbar (main) -------------------- */
+/* -------------------- Navbar -------------------- */
 export default function Navbar() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
   const location = useLocation();
   const { isDark } = useTheme();
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const reducedMotion = usePrefersReducedMotion();
+  const fmReduced = useReducedMotion();
+  const drawerRef = useRef(null);
+  const lastActive = useRef(null);
 
-  // Close mobile menu when route changes
+  // Lightweight non-blocking loader shimmer on first mount
   useEffect(() => {
+    const t = setTimeout(() => setShowLoader(false), fmReduced ? 0 : 420);
+    return () => clearTimeout(t);
+  }, [fmReduced]);
+
+  useEffect(() => {
+    // close on route change
     setOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
+  // Menu links
   const links = useMemo(
     () => [
       { to: "/", label: "Home" },
@@ -195,17 +215,323 @@ export default function Navbar() {
     []
   );
 
-  // Toggle handler memoized
-  const toggleMenu = useCallback(() => setOpen((s) => !s), []);
-  const closeMenu = useCallback(() => setOpen(false), []);
+  // toggle / close
+  const toggle = useCallback(() => setOpen((s) => !s), []);
+  const close = useCallback(() => setOpen(false), []);
 
+  /* -------------------- accessibility: focus trap & body lock -------------------- */
+  useEffect(() => {
+    if (!open) return;
+    // save last active element
+    lastActive.current = document.activeElement;
+    // lock scroll
+    const prevOverflow = document.body.style.overflow;
+    const scrollBarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    if (scrollBarWidth > 0)
+      document.body.style.paddingRight = `${scrollBarWidth}px`;
+    document.body.style.overflow = "hidden";
+
+    // focus first focusable
+    requestAnimationFrame(() => {
+      const root = drawerRef.current;
+      if (!root) return;
+      const focusable = root.querySelectorAll(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length) focusable[0].focus();
+    });
+
+    const onKey = (e) => {
+      if (e.key === "Escape") close();
+      if (e.key === "Tab") {
+        // basic focus trap
+        const root = drawerRef.current;
+        if (!root) return;
+        const focusable = Array.from(
+          root.querySelectorAll(
+            'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow || "";
+      document.body.style.paddingRight = "";
+      if (lastActive.current instanceof HTMLElement) {
+        try {
+          lastActive.current.focus();
+        } catch {
+          // ignore
+        }
+      }
+    };
+  }, [open, close]);
+
+  /* -------------------- tsParticles init + options (aura) -------------------- */
+  const particlesInit = useCallback(async (engine) => {
+    try {
+      await loadFull(engine);
+    } catch (e) {
+      // ignore if can't load plugins
+      console.warn("tsparticles loadFull failed", e);
+    }
+    // no explicit else: core loaded
+  }, []);
+
+  // Guard particles on small/low-end or reduced motion
+  const [canParticles, setCanParticles] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (reducedMotion || fmReduced) {
+      setCanParticles(false);
+      return;
+    }
+    const w = window.innerWidth;
+    const dpr = window.devicePixelRatio || 1;
+    const cores = navigator.hardwareConcurrency || 2;
+    setCanParticles(w >= 480 && cores >= 4 && dpr <= 2.5);
+  }, [reducedMotion, fmReduced]);
+
+  const particleCount =
+    typeof window !== "undefined" && window.innerWidth < 768 ? 12 : 36;
+
+  const particlesOptions = useMemo(() => {
+    return {
+      fullScreen: { enable: false },
+      particles: {
+        number: {
+          value: particleCount,
+          density: { enable: true, value_area: 800 },
+        },
+        color: { value: ["#9f7aea", "#06b6d4", "#ffffff", "#7c3aed"] },
+        shape: { type: "circle" },
+        opacity: {
+          value: 0.9,
+          random: { enable: true, minimumValue: 0.25 },
+          anim: { enable: true, speed: 0.6, minimumValue: 0.2 },
+        },
+        size: { value: { min: 0.4, max: 3.6 }, random: true },
+        move: {
+          enable: true,
+          speed: 0.22,
+          direction: "none",
+          random: true,
+          straight: false,
+          outModes: { default: "out" },
+        },
+        twinkle: {
+          particles: {
+            enable: true,
+            color: "#fff",
+            frequency: 0.01,
+            opacity: 1,
+          },
+        },
+        links: { enable: false },
+      },
+      interactivity: {
+        detectsOn: "canvas",
+        events: {
+          onHover: {
+            enable: true,
+            mode: reducedMotion ? false : "repulse",
+            parallax: { enable: true, force: 10, smooth: 20 },
+          },
+          onClick: { enable: true, mode: reducedMotion ? false : "push" },
+          resize: true,
+        },
+        modes: {
+          repulse: { distance: 90, duration: 0.6 },
+          push: { quantity: 3 },
+        },
+      },
+      retina_detect: true,
+      background: { color: "transparent" },
+    };
+  }, [particleCount, reducedMotion]);
+
+  /* -------------------- Motion variants (warp + reveal) -------------------- */
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: reducedMotion ? 0 : 0.22 } },
+    exit: { opacity: 0, transition: { duration: 0.18 } },
+  };
+
+  // Mobile drawer animates with scaleY + opacity for smoother feel on mobile
+  const drawerVariants = {
+    hidden: {
+      opacity: 0,
+      scaleY: 0.86,
+      filter: "blur(4px)",
+      transformOrigin: "top right",
+    },
+    visible: {
+      opacity: 1,
+      scaleY: 1,
+      filter: "blur(0px)",
+      transition: reducedMotion
+        ? { duration: 0 }
+        : { type: "spring", stiffness: 340, damping: 30, mass: 0.85 },
+    },
+    exit: {
+      opacity: 0,
+      scaleY: 0.9,
+      filter: "blur(3px)",
+      transition: { duration: 0.16 },
+    },
+  };
+
+  const listVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: reducedMotion ? 0 : 0.06 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: 8 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: reducedMotion ? 0 : 0.42 },
+    },
+  };
+
+  /* -------------------- micro hover/tilt props -------------------- */
+  const itemHover = reducedMotion
+    ? {}
+    : {
+        whileHover: { scale: 1.02, translateZ: 0 },
+        whileTap: { scale: 0.985 },
+        transition: { type: "spring", stiffness: 380, damping: 28 },
+      };
+
+  const ctaHover = reducedMotion
+    ? {}
+    : {
+        whileHover: { scale: 1.03, y: -3 },
+        whileTap: { scale: 0.985 },
+        transition: { type: "spring", stiffness: 360, damping: 20 },
+      };
+
+  /* -------------------- aesthetic palettes -------------------- */
+  const light = {
+    drawerBg: "rgba(255,255,255,0.66)",
+    border: "rgba(124,58,237,0.12)",
+    overlay: "rgba(10,8,10,0.28)",
+    text: "#0b1220",
+    meta: "#374151",
+    accent: "linear-gradient(90deg,#7c3aed,#06b6d4)",
+  };
+
+  const dark = {
+    drawerBg: "rgba(6,8,18,0.6)",
+    border: "rgba(159,122,234,0.08)",
+    overlay: "rgba(2,6,23,0.6)",
+    text: "#e6f0ff",
+    meta: "#c7d2fe",
+    accent: "linear-gradient(90deg,#9f7aea,#06b6d4)",
+  };
+
+  const p = isDark ? dark : light;
+
+  /* -------------------- Infinity backdrop (rotating subtle ∞) -------------------- */
+  const InfinityBackdrop = () => (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          width: "220%",
+          height: "220%",
+          transform: "translate3d(0, -10%, 0)",
+          opacity: 0.035,
+          color: isDark ? "#fff" : "#000",
+          mixBlendMode: isDark ? "screen" : "multiply",
+          fontSize: 220,
+          filter: "blur(12px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          animation: "rotateSlow 30s linear infinite",
+        }}
+      >
+        <div style={{ transform: "scale(1.2)", letterSpacing: 12 }}>
+          ∞ ∞ ∞ ∞ ∞
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes rotateSlow { from { transform: rotate(0deg) translate3d(0,-10%,0); } to { transform: rotate(360deg) translate3d(0,-10%,0); } }
+      `}</style>
+    </div>
+  );
+
+  /* -------------------- Render -------------------- */
   return (
-    <header className="fixed top-6 left-0 right-0 z-50 px-6 pointer-events-auto">
+    <ScrollReveal
+      as="header"
+      className="fixed top-6 left-0 right-0 z-50 px-6 pointer-events-auto"
+      variants={{
+        hidden: { opacity: 0, y: -50 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: {
+            duration: reducedMotion ? 0 : 0.8,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          },
+        },
+      }}
+      revealOptions={{ margin: "0px 0px -15% 0px" }}
+    >
       <nav className="max-w-6xl mx-auto flex items-center justify-between">
+        {/* Loader shimmer bar (non-blocking) */}
+        {showLoader && (
+          <motion.div
+            aria-hidden
+            initial={{ scaleX: 0, opacity: 0.6 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: reducedMotion ? 0 : 0.4, ease: "easeOut" }}
+            style={{
+              position: "absolute",
+              top: -10,
+              left: 24,
+              right: 24,
+              height: 2,
+              transformOrigin: "left",
+              background: "linear-gradient(90deg,#9f7aea,#06b6d4)",
+              borderRadius: 4,
+              pointerEvents: "none",
+              filter: "blur(0.2px)",
+            }}
+          />
+        )}
         {/* Left: Logo */}
         <div className="flex items-center gap-4">
           <div
-            // Using transform-gpu and a tiny non-layout animation for mount
             className="text-xl font-bold tracking-tight"
             style={{ transform: "translateZ(0)" }}
           >
@@ -213,26 +539,58 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Desktop links + toggle */}
+        {/* Desktop */}
         <div className="hidden md:flex gap-4 items-center">
-          <NavLinks links={links} pathname={location.pathname} />
+          <div className="flex gap-1">
+            {links.map((l) => (
+              <ScrollReveal
+                key={l.to}
+                as={Link}
+                to={l.to}
+                className="px-3 py-2 rounded-md text-sm text-white/90 hover:text-white transition"
+                variants={{
+                  hidden: { opacity: 0, y: -20 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: reducedMotion ? 0 : 0.5,
+                      ease: "easeOut",
+                    },
+                  },
+                }}
+                revealOptions={{ margin: "0px 0px -10% 0px" }}
+              >
+                {l.label}
+              </ScrollReveal>
+            ))}
+          </div>
 
           <div className="ml-1 mr-1">
-            {/* ThemeToggle itself is responsible for toggling the theme context */}
             <ThemeToggle className="text-white" />
           </div>
 
-          <a
+          <ScrollReveal
+            as="a"
             href="/Aravind R-Updated-Resume.pdf"
             download
-            className="ml-2 px-4 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold shadow transform-gpu transition-transform duration-150 motion-reduce:transition-none"
+            className="ml-2 px-4 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold shadow transform-gpu transition-transform duration-150"
             aria-label="Download resume"
-            // Small transform on hover is GPU friendly; remove if user prefers reduced motion.
-            onMouseDown={(e) => e.currentTarget.classList.add("active")}
-            onMouseUp={(e) => e.currentTarget.classList.remove("active")}
+            variants={{
+              hidden: { opacity: 0, scale: 0.8 },
+              visible: {
+                opacity: 1,
+                scale: 1,
+                transition: {
+                  duration: reducedMotion ? 0 : 0.6,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            revealOptions={{ margin: "0px 0px -10% 0px" }}
           >
             Resume
-          </a>
+          </ScrollReveal>
         </div>
 
         {/* Mobile controls */}
@@ -241,59 +599,271 @@ export default function Navbar() {
             <ThemeToggle className="text-white" />
           </div>
 
-          <button
-            onClick={toggleMenu}
+          <ScrollReveal
+            as="button"
+            onClick={toggle}
             aria-label={open ? "Close menu" : "Open menu"}
             className="p-2 rounded-md glass relative overflow-hidden"
-            style={{ willChange: "opacity, transform" }}
+            style={{
+              willChange: "transform, opacity",
+              background: isDark
+                ? "rgba(255,255,255,0.04)"
+                : "rgba(255,255,255,0.06)",
+              backdropFilter: "blur(6px)",
+            }}
+            variants={{
+              hidden: { opacity: 0, rotate: -90 },
+              visible: {
+                opacity: 1,
+                rotate: 0,
+                transition: {
+                  duration: reducedMotion ? 0 : 0.5,
+                  ease: "easeOut",
+                },
+              },
+            }}
+            revealOptions={{ margin: "0px 0px -10% 0px" }}
           >
-            {/* Crossfading icons instead of mounting/unmounting */}
-            <IconCrossfade open={open} size={20} />
-          </button>
+            <motion.span
+              animate={{ rotate: open && !reducedMotion ? 90 : 0 }}
+              transition={{ type: "spring", stiffness: 380, damping: 24 }}
+            >
+              <IconCrossfade open={open} reduced={reducedMotion} />
+            </motion.span>
+          </ScrollReveal>
         </div>
       </nav>
 
-      {/* Mobile menu: keep simple, fade on mount (prefers-reduced-motion respected) */}
-      {/* We intentionally render conditionally to avoid always-in-DOM mobile menu on desktop. */}
-      {open && (
-        <div
-          className={`md:hidden mt-3 transition-opacity duration-200 motion-reduce:transition-none`}
-          style={{ animationFillMode: "both" }}
-          aria-hidden={false}
-        >
-          <div
-            className="glass rounded-lg p-4 max-w-md mx-auto"
-            // Keep animations GPU-friendly if any are added later
-            style={{ willChange: "opacity, transform" }}
-          >
-            <div className="flex flex-col gap-2">
-              {links.map((l) => (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  className="py-2 px-3 rounded hover:bg-white/5 text-white transition-colors duration-150 motion-reduce:transition-none"
-                  onClick={closeMenu}
+      {/* Mobile drawer (AnimatePresence) */}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Overlay */}
+            <motion.div
+              key="overlay"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={overlayVariants}
+              onClick={close}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 60,
+                background: p.overlay,
+                backdropFilter: "blur(2px)",
+                WebkitBackdropFilter: "blur(2px)",
+              }}
+            />
+
+            {/* Drawer */}
+            <motion.aside
+              key="drawer"
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={drawerVariants}
+              style={{
+                position: "fixed",
+                top: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 70,
+                width: "92%",
+                maxWidth: 420,
+                padding: 20,
+                borderRadius: 16,
+                margin: 12,
+                background: p.drawerBg,
+                border: `1px solid ${p.border}`,
+                boxShadow: isDark
+                  ? "0 15px 60px rgba(0,0,0,0.6)"
+                  : "0 10px 40px rgba(2,6,23,0.08)",
+                overflow: "auto",
+                WebkitOverflowScrolling: "touch",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                transformOrigin: "right center",
+                willChange: "transform, opacity, filter",
+              }}
+            >
+              {/* Infinity rotating backdrop */}
+              <InfinityBackdrop />
+
+              {/* particle aura layer */}
+              {canParticles && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    zIndex: 1,
+                    pointerEvents: "none",
+                    borderRadius: 12,
+                    overflow: "hidden",
+                  }}
                 >
-                  {l.label}
-                </Link>
-              ))}
+                  <Particles
+                    id="drawer-particles"
+                    init={particlesInit}
+                    options={particlesOptions}
+                  />
+                </div>
+              )}
 
-              <div className="py-2 px-3 flex items-center gap-3">
-                <span className="text-sm text-white/70">Theme</span>
-                <ThemeToggle className="text-white" />
+              {/* content layer */}
+              <div style={{ position: "relative", zIndex: 2 }}>
+                {/* header row */}
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <Logo isDark={isDark} />
+                  </div>
+
+                  {/* close with morph visual */}
+                  <button
+                    onClick={() => {
+                      // small spark visual (CSS)
+                      setOpen(false);
+                    }}
+                    aria-label="Close"
+                    className="p-2 rounded-md inline-flex items-center justify-center"
+                    style={{ background: "transparent", border: "none" }}
+                  >
+                    <motion.div
+                      initial={{ scale: 1 }}
+                      animate={{
+                        rotate: open && !reducedMotion ? 180 : 0,
+                        scale: 1,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 420,
+                        damping: 30,
+                      }}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FiX size={22} />
+                    </motion.div>
+                  </button>
+                </div>
+
+                {/* nav list */}
+                <motion.nav
+                  initial="hidden"
+                  animate="visible"
+                  variants={listVariants}
+                  aria-label="Primary"
+                >
+                  <ul className="flex flex-col gap-3">
+                    {links.map((l) => {
+                      const active = location.pathname === l.to;
+                      return (
+                        <motion.li
+                          key={l.to}
+                          variants={itemVariants}
+                          {...itemHover}
+                        >
+                          <Link
+                            to={l.to}
+                            onClick={close}
+                            className="block w-full rounded-xl px-4 py-3 text-lg font-medium"
+                            style={{
+                              color: p.text,
+                              background: active
+                                ? isDark
+                                  ? "rgba(255,255,255,0.03)"
+                                  : "rgba(2,6,23,0.03)"
+                                : "transparent",
+                              boxShadow: active
+                                ? `0 14px 40px ${
+                                    isDark
+                                      ? "rgba(159,122,234,0.06)"
+                                      : "rgba(124,58,237,0.04)"
+                                  }`
+                                : "none",
+                              transform: "translateZ(0)",
+                              borderRadius: 12,
+                              border: "1px solid transparent",
+                            }}
+                          >
+                            <span
+                              style={{
+                                display: "inline-block",
+                                position: "relative",
+                              }}
+                            >
+                              {l.label}
+                              <span
+                                style={{
+                                  display: active ? "inline-block" : "none",
+                                  position: "absolute",
+                                  left: -14,
+                                  top: "50%",
+                                  transform: "translateY(-50%)",
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: 999,
+                                  background:
+                                    "linear-gradient(90deg,#9f7aea,#06b6d4)",
+                                  boxShadow: `0 6px 18px ${
+                                    isDark
+                                      ? "rgba(159,122,234,0.12)"
+                                      : "rgba(6,182,212,0.08)"
+                                  }`,
+                                }}
+                              />
+                            </span>
+                          </Link>
+                        </motion.li>
+                      );
+                    })}
+                  </ul>
+                </motion.nav>
+
+                {/* theme toggle row */}
+                <motion.div
+                  className="mt-5 flex items-center justify-between"
+                  variants={itemVariants}
+                >
+                  <div style={{ color: p.meta }}>Theme</div>
+                  <div>
+                    <ThemeToggle />
+                  </div>
+                </motion.div>
+
+                {/* CTA */}
+                <motion.div className="mt-6" variants={itemVariants}>
+                  <motion.a
+                    {...ctaHover}
+                    href="/Aravind R-Updated-Resume.pdf"
+                    download
+                    onClick={close}
+                    className="w-full inline-flex items-center justify-center px-4 py-3 rounded-full font-bold"
+                    style={{
+                      background: p.accent,
+                      color: isDark ? "#060814" : "#010214",
+                      boxShadow: isDark
+                        ? "0 12px 40px rgba(159,122,234,0.12)"
+                        : "0 10px 32px rgba(6,182,212,0.12)",
+                      borderRadius: 999,
+                      transform: "translateZ(0)",
+                    }}
+                  >
+                    Download Resume
+                  </motion.a>
+                </motion.div>
               </div>
-
-              <a
-                href="/Aravind R-Updated-Resume.pdf"
-                download
-                className="mt-2 inline-block px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold"
-              >
-                Download Resume
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
-    </header>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </ScrollReveal>
   );
 }

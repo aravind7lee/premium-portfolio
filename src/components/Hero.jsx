@@ -1,6 +1,6 @@
 // src/components/Hero.jsx
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import ParticleBackground from "./ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import ResumeButton from "./ResumeButton";
@@ -158,7 +158,7 @@ export default function Hero() {
       <div className="max-w-6xl mx-auto px-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start md:items-center">
           {/* CONTENT COLUMN (left on md, second on mobile) */}
-          <motion.div
+          <Motion.div
             // attach the observer ref to the content wrapper
             ref={contentRef}
             variants={reduce ? {} : contentVariant}
@@ -175,8 +175,21 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg text-white/80 max-w-xl mx-auto md:mx-0">
-               Crafting modern digital experiences with <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">React</span>, <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">Node.js</span>, and <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">TailwindCSS </span>
-         Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions
+              Crafting modern digital experiences with{" "}
+              <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
+                React
+              </span>
+              ,{" "}
+              <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
+                Node.js
+              </span>
+              , and{" "}
+              <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
+                TailwindCSS{" "}
+              </span>
+              Specializing in responsive web applications that blend front-end
+              elegance with back-end robustness, transforming ideas into
+              high-performance solutions
             </p>
 
             <div className="flex gap-4 items-center justify-center md:justify-start">
@@ -200,10 +213,10 @@ export default function Hero() {
                 <span className="animate-bounce">↓</span> Scroll to projects
               </a>
             </div>
-          </motion.div>
+          </Motion.div>
 
           {/* IMAGE COLUMN (right on md, first on mobile) */}
-          <motion.div
+          <Motion.div
             ref={imageRef}
             variants={reduce ? {} : imageWrapVariant}
             initial="hidden"
@@ -223,7 +236,7 @@ export default function Hero() {
                   />
                 ) : (
                   // normal: outer wrapper controlled by IntersectionObserver; inner img does a slow breathing animation while visible
-                  <motion.img
+                  <Motion.img
                     src={Profile1}
                     alt="Aravind profile"
                     loading="lazy"
@@ -251,7 +264,7 @@ export default function Hero() {
             <div className="mt-6 px-14 text-sm uppercase tracking-wider text-center md:text-right font-semibold text-primary-600 dark:text-primary-400">
               Fullstack Web Developer
             </div>
-          </motion.div>
+          </Motion.div>
         </div>
       </div>
     </section>
