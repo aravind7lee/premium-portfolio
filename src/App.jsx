@@ -29,10 +29,10 @@ export default function App() {
         {/* Navbar */}
         <Navbar />
 
-        {/* Page transitions + lazy loading */}
-        <React.Suspense
-          fallback={<div className="pt-24 px-6 text-white/70">Loading...</div>}
-        >
+        {/* Page transitions + lazy loading
+            Footer is included inside Suspense so it won't render before the page.
+            We use a null fallback to avoid any visual flash like "Loading...". */}
+        <React.Suspense fallback={null}>
           <AnimatePresence mode="wait" initial={false}>
             <Routes key={location.pathname} location={location}>
               <Route path="/" element={<Home />} />
@@ -44,10 +44,10 @@ export default function App() {
               <Route path="*" element={<Home />} />
             </Routes>
           </AnimatePresence>
-        </React.Suspense>
 
-        {/* Footer */}
-        <Footer />
+          {/* Footer */}
+          <Footer />
+        </React.Suspense>
       </div>
     </ErrorBoundary>
   );
