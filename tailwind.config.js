@@ -4,6 +4,32 @@ export default {
   darkMode: "class", // manual dark mode via class on <html>
   theme: {
     extend: {
+      fontFamily: {
+        inter: [
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "Noto Sans",
+          "sans-serif",
+        ],
+        manrope: [
+          "Manrope",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "Noto Sans",
+          "sans-serif",
+        ],
+      },
       colors: {
         // Base backgrounds
         "bg-900": "#0b0f14",
