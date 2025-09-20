@@ -248,6 +248,16 @@ export default function Home() {
     rootMargin: "0px 0px -15% 0px",
     once: false,
   });
+  const [aboutTextRef, aboutTextVisible] = useScrollReveal({
+    threshold: 0.3,
+    rootMargin: "0px 0px -10% 0px",
+    once: false,
+  });
+  const [educationRef, educationVisible] = useScrollReveal({
+    threshold: 0.3,
+    rootMargin: "0px 0px -10% 0px",
+    once: false,
+  });
 
   const [ctaRef, ctaVisible] = useScrollReveal({
     threshold: 0.12,
@@ -390,7 +400,13 @@ export default function Home() {
           ) : (
             <div className="grid md:grid-cols-2 gap-12 items-center">
               {/* About text */}
-              <Motion.div variants={reduce ? {} : variants.fadeUp} style={{ willChange: "transform, opacity" }}>
+              <Motion.div 
+                ref={aboutTextRef}
+                variants={reduce ? {} : variants.fadeUp}
+                initial={reduce ? "visible" : "hidden"}
+                animate={reduce ? "visible" : aboutTextVisible ? "visible" : "visible"}
+                style={{ willChange: "transform, opacity" }}
+              >
                 <h3 className="text-2xl md:text-3xl mb-6 font-bold bg-clip-text">About Me</h3>
                 <p className="mt-3 text-white/80 text-lg leading-relaxed">
                   I'm a passionate developer who builds production-ready applications with a focus on exceptional UX, performance,
@@ -423,9 +439,10 @@ export default function Home() {
 
               {/* Education Section */}
               <Motion.div
+                ref={educationRef}
                 variants={reduce ? {} : variants.slideInRight}
-                initial="hidden"
-                animate={animState(aboutVisible)}
+                initial={reduce ? "visible" : "hidden"}
+                animate={reduce ? "visible" : educationVisible ? "visible" : "visible"}
                 className="glass rounded-xl p-8 backdrop-blur-lg"
                 style={{ willChange: "transform, opacity" }}
               >
@@ -433,9 +450,18 @@ export default function Home() {
                 <h4 className="font-bold text-2xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Education</h4>
 
                 {/* Education List */}
-                <ul className="space-y-8">
+                <Motion.ul 
+                  variants={reduce ? {} : variants.staggerParent}
+                  initial={reduce ? "visible" : "hidden"}
+                  animate={reduce ? "visible" : educationVisible ? "visible" : "visible"}
+                  className="space-y-8"
+                >
                   {/* MCA */}
-                  <Motion.li variants={reduce ? {} : variants.fadeIn} className="relative pl-8 border-l-2 border-white/20">
+                  <Motion.li 
+                    variants={reduce ? {} : variants.fadeIn} 
+                    className="relative pl-8 border-l-2 border-white/20"
+                    style={{ willChange: "transform, opacity" }}
+                  >
                     <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-md shadow-blue-500/40"></div>
 
                     <strong className="block text-lg font-semibold text-white">Master of Computer Application (MCA)</strong>
@@ -446,7 +472,11 @@ export default function Home() {
                   </Motion.li>
 
                   {/* BCA */}
-                  <Motion.li variants={reduce ? {} : variants.fadeIn} className="relative pl-8 border-l-2 border-white/20">
+                  <Motion.li 
+                    variants={reduce ? {} : variants.fadeIn} 
+                    className="relative pl-8 border-l-2 border-white/20"
+                    style={{ willChange: "transform, opacity" }}
+                  >
                     <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-pink-500 to-red-500 shadow-md shadow-pink-500/40"></div>
 
                     <strong className="block text-lg font-semibold text-white">Bachelor of Computer Application (BCA)</strong>
@@ -455,7 +485,7 @@ export default function Home() {
 
                     <p className="mt-1 text-white/70">2020 – 2023 • <span className="font-medium">CGPA: 9.30</span></p>
                   </Motion.li>
-                </ul>
+                </Motion.ul>
               </Motion.div>
             </div>
           )}

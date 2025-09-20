@@ -11,7 +11,9 @@ import logoDark from "../assets/logo_dark.png";
 
 export default function Footer() {
   const { isDark } = useTheme();
-  const prefersReducedMotion = usePrefersReducedMotion();
+  // Force UltraSmooth = true everywhere (always ON)
+  const ultraSmooth = true;
+  const prefersReducedMotion = false; // Override for ultra-smooth
   const [footerRef, footerVisible] = useScrollReveal({ threshold: 0.1 });
 
   // Preload logos
@@ -22,59 +24,60 @@ export default function Footer() {
     darkImg.src = logoDark;
   }, []);
 
-  // Animation variants
+  // Ultra-smooth optimized variants with GPU acceleration
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+        ease: [0.25, 0.46, 0.45, 0.94],
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: prefersReducedMotion ? 0.1 : 0.6,
-        ease: "easeOut",
+        duration: 0.3,
+        ease: [0.25, 0.46, 0.45, 0.94],
       },
     },
   };
 
   const socialVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, scale: 0.9 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
-        duration: prefersReducedMotion ? 0.1 : 0.5,
-        ease: "easeOut",
+        duration: 0.25,
+        ease: [0.25, 0.46, 0.45, 0.94],
       },
     },
   };
 
   return (
     <>
-      {/* Animated Gradient Border Top */}
+      {/* Ultra-Smooth Animated Gradient Border Top */}
       <div className="relative w-full h-[1px] overflow-hidden">
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400 via-purple-400 to-transparent"
-          animate={
-            prefersReducedMotion
-              ? {}
-              : {
-                  x: ["-100%", "100%"],
-                }
-          }
+          animate={{
+            x: ["-100%", "100%"],
+          }}
           transition={{
-            duration: 8,
+            duration: 6,
             repeat: Infinity,
             ease: "linear",
+          }}
+          style={{
+            willChange: "transform",
+            backfaceVisibility: "hidden",
           }}
         />
       </div>
@@ -83,7 +86,7 @@ export default function Footer() {
         ref={footerRef}
         variants={containerVariants}
         initial="hidden"
-        animate={prefersReducedMotion ? "visible" : footerVisible ? "visible" : "hidden"}
+        animate={footerVisible ? "visible" : "hidden"}
         className={`relative w-full py-8 px-4 md:px-12 ${
           isDark
             ? "bg-gradient-to-b from-indigo-900/40 via-purple-900/30 to-transparent"
@@ -92,40 +95,40 @@ export default function Footer() {
         role="contentinfo"
         aria-label="Site footer"
       >
-        {/* Background Glow Effects */}
+        {/* Ultra-Smooth Background Glow Effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            animate={
-              prefersReducedMotion
-                ? {}
-                : {
-                    scale: [1, 1.1, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }
-            }
+            animate={{
+              scale: [1, 1.06, 1],
+              opacity: [0.3, 0.45, 0.3],
+            }}
             transition={{
-              duration: 6,
+              duration: 4,
               repeat: Infinity,
-              ease: "easeInOut",
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
+            style={{
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
             }}
             className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl ${
               isDark ? "bg-indigo-500/20" : "bg-indigo-300/40"
             }`}
           />
           <motion.div
-            animate={
-              prefersReducedMotion
-                ? {}
-                : {
-                    scale: [1.1, 1, 1.1],
-                    opacity: [0.2, 0.4, 0.2],
-                  }
-            }
+            animate={{
+              scale: [1.06, 1, 1.06],
+              opacity: [0.2, 0.35, 0.2],
+            }}
             transition={{
-              duration: 8,
+              duration: 5,
               repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2,
+              ease: [0.25, 0.46, 0.45, 0.94],
+              delay: 1.5,
+            }}
+            style={{
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
             }}
             className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full blur-3xl ${
               isDark ? "bg-purple-500/20" : "bg-purple-300/40"
@@ -143,15 +146,18 @@ export default function Footer() {
             >
               {/* Logo */}
               <motion.div
-                whileHover={
-                  prefersReducedMotion
-                    ? {}
-                    : {
-                        scale: 1.05,
-                        filter: "drop-shadow(0 0 20px rgba(99, 102, 241, 0.4))",
-                      }
-                }
-                transition={{ duration: 0.3 }}
+                whileHover={{
+                  scale: 1.03,
+                  filter: "drop-shadow(0 0 15px rgba(99, 102, 241, 0.4))",
+                }}
+                transition={{ 
+                  duration: 0.2,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+                style={{
+                  willChange: "transform",
+                  backfaceVisibility: "hidden",
+                }}
               >
                 <Link to="/" aria-label="Home" className="block">
                   <div className="relative w-48 h-12 md:w-56 md:h-14">
@@ -177,13 +183,17 @@ export default function Footer() {
               <div className="text-center md:text-left space-y-2">
                 <motion.div
                   className={`text-sm font-medium bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent`}
-                  animate={prefersReducedMotion ? {} : {
+                  animate={{
                     backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
                   }}
                   transition={{
-                    duration: 3,
+                    duration: 2.5,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                  }}
+                  style={{
+                    willChange: "background-position",
+                    backfaceVisibility: "hidden",
                   }}
                 >
                   © {new Date().getFullYear()} Arav - All rights reserved
@@ -192,13 +202,17 @@ export default function Footer() {
                   isDark ? "text-gray-400" : "text-gray-600"
                 }`}>
                   <motion.span
-                    animate={prefersReducedMotion ? {} : {
-                      scale: [1, 1.2, 1]
+                    animate={{
+                      scale: [1, 1.15, 1]
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 1.8,
                       repeat: Infinity,
-                      ease: "easeInOut"
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                    style={{
+                      willChange: "transform",
+                      backfaceVisibility: "hidden",
                     }}
                   >
                     ✨
@@ -241,17 +255,20 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     aria-label={label}
                     variants={socialVariants}
-                    whileHover={
-                      prefersReducedMotion
-                        ? {}
-                        : {
-                            scale: 1.1,
-                            filter: "drop-shadow(0 8px 16px rgba(99, 102, 241, 0.3))",
-                          }
-                    }
-                    whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className={`p-3 rounded-xl transition-all duration-300 ${
+                    whileHover={{
+                      scale: 1.08,
+                      filter: "drop-shadow(0 6px 12px rgba(99, 102, 241, 0.3))",
+                    }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ 
+                      duration: 0.15,
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                    style={{
+                      willChange: "transform",
+                      backfaceVisibility: "hidden",
+                    }}
+                    className={`p-3 rounded-xl transition-all duration-200 ${
                       isDark
                         ? "text-gray-300 hover:text-white hover:bg-white/10"
                         : "text-gray-700 hover:text-gray-900 hover:bg-white/20"
