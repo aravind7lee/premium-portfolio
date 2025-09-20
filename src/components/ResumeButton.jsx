@@ -26,7 +26,8 @@ export default function ResumeButton() {
         onClick={handleDownload}
         className="px-5 py-3 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold shadow-md"
         aria-label="Download resume"
-      >
+      > 
+      
         {loading ? (
           <div className="flex items-center gap-3">
             <div className="w-24 h-3 rounded bg-white/30 animate-pulse" />

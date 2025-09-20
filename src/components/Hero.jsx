@@ -93,6 +93,7 @@ const imageWrapVariant = {
 
 export default function Hero() {
   const reduce = usePrefersReducedMotion();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // For now, let's disable the skeleton loading in Hero to fix the display issue
   // The skeleton loading can be re-enabled later if needed
@@ -195,15 +196,48 @@ export default function Hero() {
             </p>
 
             <div className="flex gap-4 items-center justify-center md:justify-start">
-              <ResumeButton />
+              {/* Resume Download Button */}
+              <button
+                onClick={() => {
+                  setIsDownloading(true);
+                  setTimeout(() => {
+                    setIsDownloading(false);
+                    // Trigger download after animation completes
+                    const a = document.createElement('a');
+                    a.href = '/Aravind R-Updated-Resume.pdf';
+                    a.download = 'Aravind R-Updated-Resume.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  }, 2000);
+                }}
+                className="relative group px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 hover:scale-105 hover:from-purple-500 hover:to-teal-300 overflow-hidden"
+                aria-label="Download resume"
+              >
+                <span className="relative z-10">
+                  {isDownloading ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 h-3 rounded bg-white/30 animate-pulse" />
+                      Preparing...
+                    </div>
+                  ) : (
+                    'Download Resume'
+                  )}
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </button>
 
+              {/* Mail Me Button */}
               <a
                 href={mailtoHref}
                 onClick={handleMailClick}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-md glass hover:scale-[1.02] transition"
+                className="relative group inline-flex items-center gap-2 px-6 py-3 rounded-xl glass border border-white/20 transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 hover:scale-105 overflow-hidden"
                 aria-label="Send me an email"
               >
-                <FiMail /> Mail Me
+                <span className="relative z-10 flex items-center gap-2">
+                  <FiMail className="transition-transform duration-300 group-hover:rotate-12" /> Mail Me
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </a>
             </div>
 
