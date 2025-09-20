@@ -182,9 +182,7 @@ export default function Home() {
     error: heroError,
   } = useSkeletonAsync(async () => {
     // Simulate loading hero data - optimized 1.5 second loading time
-    console.log('Hero skeleton loading started...');
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log('Hero skeleton loading finished!');
     return {
       loaded: true,
     };
@@ -197,9 +195,7 @@ export default function Home() {
     error: projectsError,
   } = useSkeletonAsync(async () => {
     // Simulate loading projects data - increased time to make skeleton visible
-    console.log('Projects skeleton loading started...');
     await new Promise((resolve) => setTimeout(resolve, 3500));
-    console.log('Projects skeleton loading finished!');
     return projects.slice(0, 3);
   });
 
@@ -209,8 +205,8 @@ export default function Home() {
     isLoading: aboutLoading,
     error: aboutError,
   } = useSkeletonAsync(async () => {
-    // Simulate loading about data
-    await new Promise((resolve) => setTimeout(resolve, 1800));
+    // Simulate loading about data - reduced to 1 second
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return {
       loaded: true,
     };
@@ -232,13 +228,7 @@ export default function Home() {
   // helper for motion state (if reduced motion, always "visible")
   const animState = (visible) => (reduce ? "visible" : visible ? "visible" : "hidden");
 
-  // Debug logging
-  console.log('Home page loading states:', {
-    heroLoading,
-    projectsLoading,
-    aboutLoading,
-    ctaLoading
-  });
+
 
   /* -----------------------
      Scroll reveal refs
@@ -258,11 +248,7 @@ export default function Home() {
     rootMargin: "0px 0px -15% 0px",
     once: false,
   });
-  const [timelineRef, timelineVisible] = useScrollReveal({
-    threshold: 0.18,
-    rootMargin: "0px 0px -10% 0px",
-    once: false,
-  });
+
   const [ctaRef, ctaVisible] = useScrollReveal({
     threshold: 0.12,
     rootMargin: "0px 0px -20% 0px",
@@ -435,12 +421,11 @@ export default function Home() {
                 </Motion.div>
               </Motion.div>
 
-              {/* Education Section (Replacing Timeline) */}
+              {/* Education Section */}
               <Motion.div
-                ref={timelineRef}
                 variants={reduce ? {} : variants.slideInRight}
                 initial="hidden"
-                animate={animState(timelineVisible)}
+                animate={animState(aboutVisible)}
                 className="glass rounded-xl p-8 backdrop-blur-lg"
                 style={{ willChange: "transform, opacity" }}
               >
