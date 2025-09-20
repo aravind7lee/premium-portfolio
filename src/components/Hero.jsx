@@ -195,7 +195,7 @@ export default function Hero() {
                 "Crafting modern digital experiences with React, Node.js, and TailwindCSS. Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions"}
             </p>
 
-            <div className="flex gap-4 items-center justify-center md:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center md:justify-start">
               {/* Resume Download Button */}
               <button
                 onClick={() => {
@@ -211,17 +211,18 @@ export default function Hero() {
                     document.body.removeChild(a);
                   }, 2000);
                 }}
-                className="relative group px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 hover:scale-105 hover:from-purple-500 hover:to-teal-300 overflow-hidden"
+                disabled={isDownloading}
+                className="relative group w-full sm:w-auto px-4 sm:px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 active:scale-95 sm:hover:scale-105 hover:from-purple-500 hover:to-teal-300 overflow-hidden touch-manipulation disabled:opacity-80"
                 aria-label="Download resume"
               >
-                <span className="relative z-10">
+                <span className="relative z-10 flex items-center justify-center min-h-[24px]">
                   {isDownloading ? (
-                    <div className="flex items-center gap-3">
-                      <div className="w-24 h-3 rounded bg-white/30 animate-pulse" />
-                      Preparing...
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-16 sm:w-20 md:w-24 h-2 sm:h-3 rounded bg-white/40 animate-pulse" />
+                      <span className="text-sm sm:text-base">Preparing...</span>
                     </div>
                   ) : (
-                    'Download Resume'
+                    <span className="text-sm sm:text-base">Download Resume</span>
                   )}
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -231,11 +232,12 @@ export default function Hero() {
               <a
                 href={mailtoHref}
                 onClick={handleMailClick}
-                className="relative group inline-flex items-center gap-2 px-6 py-3 rounded-xl glass border border-white/20 transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 hover:scale-105 overflow-hidden"
+                className="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl glass border border-white/20 transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 active:scale-95 sm:hover:scale-105 overflow-hidden touch-manipulation"
                 aria-label="Send me an email"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <FiMail className="transition-transform duration-300 group-hover:rotate-12" /> Mail Me
+                  <FiMail className="text-base sm:text-lg transition-transform duration-300 group-hover:rotate-12" /> 
+                  <span className="text-sm sm:text-base">Mail Me</span>
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </a>
