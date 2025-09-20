@@ -209,7 +209,7 @@ export default function Hero() {
               >
                 <ResumeButton />
                 {/* Enhanced glow for resume button */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-teal-400/30 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-teal-400/30 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl cursor-pointer" />
               </Motion.div>
 
               <Motion.div 
@@ -243,7 +243,7 @@ export default function Hero() {
                 </a>
                 
                 {/* Enhanced glow effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-teal-400/20 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-teal-400/20 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl cursor-pointer" />
               </Motion.div>
             </div>
 
