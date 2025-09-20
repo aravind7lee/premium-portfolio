@@ -195,73 +195,26 @@ export default function Hero() {
             </p>
 
             <div className="flex gap-4 items-center justify-center md:justify-start">
-              <Motion.div 
-                className="relative group"
-                whileHover={reduce ? {} : {
-                  scale: 1.05,
-                  y: -2,
-                  transition: { duration: 0.2, ease: "easeOut" }
-                }}
-                whileTap={reduce ? {} : {
-                  scale: 0.96,
-                  transition: { duration: 0.1 }
-                }}
-              >
-                <ResumeButton />
-                {/* Enhanced glow for resume button */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-teal-400/30 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl cursor-pointer" />
-              </Motion.div>
+              <ResumeButton />
 
-              <Motion.div 
-                className="relative group"
-                whileHover={reduce ? {} : {
-                  scale: 1.05,
-                  y: -2,
-                  transition: { duration: 0.2, ease: "easeOut" }
-                }}
-                whileTap={reduce ? {} : {
-                  scale: 0.96,
-                  transition: { duration: 0.1 }
-                }}
+              <a
+                href={mailtoHref}
+                onClick={handleMailClick}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-md glass hover:scale-[1.02] transition"
+                aria-label="Send me an email"
               >
-                <a
-                  href={mailtoHref}
-                  onClick={handleMailClick}
-                  className="relative inline-flex items-center gap-2 px-5 py-3 rounded-xl glass transition-all duration-300 overflow-hidden border border-white/10"
-                  aria-label="Send me an email"
-                >
-                  {/* Hover background gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 to-teal-400/40 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
-                  
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
-                  
-                  {/* Content */}
-                  <span className="relative z-10 flex items-center gap-2 transition-all duration-300 group-hover:text-white group-hover:drop-shadow-lg">
-                    <FiMail className="transition-transform duration-300 group-hover:rotate-12" /> Mail Me
-                  </span>
-                </a>
-                
-                {/* Enhanced glow effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-teal-400/20 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl cursor-pointer" />
-              </Motion.div>
+                <FiMail /> Mail Me
+              </a>
             </div>
 
-            <Motion.div 
-              className="mt-6 relative group"
-              whileHover={reduce ? {} : {
-                y: -1,
-                transition: { duration: 0.2, ease: "easeOut" }
-              }}
-            >
+            <div className="mt-6">
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-all duration-300 px-3 py-2 rounded-lg hover:bg-white/5"
+                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white"
               >
-                <span className="animate-bounce transition-transform duration-300 group-hover:scale-110">↓</span> 
-                <span className="transition-all duration-300 group-hover:font-medium group-hover:drop-shadow-sm">Scroll to projects</span>
+                <span className="animate-bounce">↓</span> Scroll to projects
               </a>
-            </Motion.div>
+            </div>
           </Motion.div>
 
           {/* IMAGE COLUMN (right on md, first on mobile) */}
