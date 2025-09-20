@@ -47,10 +47,10 @@ const HeaderSection = ({ isLoading, error }) => {
       <Motion.div
         ref={headerRef}
         variants={headingVariant}
-        initial="hidden"
-        animate={prefersReducedMotion ? "visible" : headerVisible ? "visible" : "hidden"}
+        initial={prefersReducedMotion ? "visible" : "hidden"}
+        animate="visible"
         role="status"
-        aria-busy={!headerVisible}
+        aria-busy={false}
       >
         <h1
           id="skills-heading"
@@ -66,10 +66,10 @@ const HeaderSection = ({ isLoading, error }) => {
       <Motion.div
         ref={subtitleRef}
         variants={revealVariants}
-        initial="hidden"
-        animate={prefersReducedMotion ? "visible" : subtitleVisible ? "visible" : "hidden"}
+        initial={prefersReducedMotion ? "visible" : "hidden"}
+        animate="visible"
         role="status"
-        aria-busy={!subtitleVisible}
+        aria-busy={false}
       >
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
           Technologies and tools I use to bring ideas to life
