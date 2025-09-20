@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useRafThrottle } from "../hooks/perf";
+import { SkeletonImageWithLQIP } from "./skeleton";
 
 export default function ProjectCard({ project, onOpen }) {
   const ref = React.useRef();
@@ -74,12 +75,11 @@ export default function ProjectCard({ project, onOpen }) {
       aria-label={`Open project ${project.title}`}
     >
       <div className="relative overflow-hidden rounded-lg">
-        <img
+        <SkeletonImageWithLQIP
           src={project.image}
           alt={project.title}
           className="w-full h-40 object-cover rounded-md"
-          loading="lazy"
-          decoding="async"
+          lqip={project.lqip}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
       </div>

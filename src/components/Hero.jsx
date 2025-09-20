@@ -6,6 +6,7 @@ import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import ResumeButton from "./ResumeButton";
 import { FiMail } from "react-icons/fi";
 import Profile1 from "../assets/Profile1.jpg"; // ensure path is correct
+// Skeleton imports removed to fix Hero display issue
 
 /**
  * useScrollReveal - lightweight IntersectionObserver hook
@@ -93,6 +94,17 @@ const imageWrapVariant = {
 export default function Hero() {
   const reduce = usePrefersReducedMotion();
 
+  // For now, let's disable the skeleton loading in Hero to fix the display issue
+  // The skeleton loading can be re-enabled later if needed
+  const heroData = {
+    profileImage: Profile1,
+    content: {
+      title: "I build premium interactive web experiences.",
+      description:
+        "Crafting modern digital experiences with React, Node.js, and TailwindCSS. Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions",
+    },
+  };
+
   // Two independent reveals: content column and profile-image column.
   // They replay on re-entry (once: false)
   const [contentRef, contentVisible] = useScrollReveal({
@@ -144,6 +156,9 @@ export default function Hero() {
     [mailtoHref, gmailComposeUrl]
   );
 
+  // Skeleton loading logic removed to fix display issue
+  // The Hero component will now always render its content
+
   return (
     // pt-[120px] prevents overlap with a fixed navbar on mobile (adjust to match your layout)
     <section
@@ -175,21 +190,8 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg text-white/80 max-w-xl mx-auto md:mx-0">
-              Crafting modern digital experiences with{" "}
-              <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
-                React
-              </span>
-              ,{" "}
-              <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
-                Node.js
-              </span>
-              , and{" "}
-              <span className="font-semibold bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
-                TailwindCSS{" "}
-              </span>
-              Specializing in responsive web applications that blend front-end
-              elegance with back-end robustness, transforming ideas into
-              high-performance solutions
+              {heroData?.content?.description ||
+                "Crafting modern digital experiences with React, Node.js, and TailwindCSS. Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions"}
             </p>
 
             <div className="flex gap-4 items-center justify-center md:justify-start">
@@ -229,7 +231,7 @@ export default function Hero() {
                 {reduce ? (
                   // reduced motion: static img
                   <img
-                    src={Profile1}
+                    src={heroData?.profileImage || Profile1}
                     alt="Aravind profile"
                     loading="lazy"
                     className="w-full h-full object-cover block"
@@ -237,7 +239,7 @@ export default function Hero() {
                 ) : (
                   // normal: outer wrapper controlled by IntersectionObserver; inner img does a slow breathing animation while visible
                   <Motion.img
-                    src={Profile1}
+                    src={heroData?.profileImage || Profile1}
                     alt="Aravind profile"
                     loading="lazy"
                     style={{ transformOrigin: "50% 50%" }}

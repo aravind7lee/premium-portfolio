@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import projects from "../data/projects";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import ProjectCard from "../components/ProjectCard";
-import SkeletonLoader from "../components/SkeletonLoader";
+import { SkeletonProjectCard, useSkeletonAsync } from "../components/skeleton";
 
 /**
  * Shared observer registry for reusing IntersectionObservers
@@ -26,7 +26,9 @@ function useScrollReveal({
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef(null);
 
-  const key = `${Array.isArray(threshold) ? threshold.join(",") : threshold}|${rootMargin}`;
+  const key = `${
+    Array.isArray(threshold) ? threshold.join(",") : threshold
+  }|${rootMargin}`;
 
   const unregisterElement = useCallback(
     (el) => {
@@ -138,14 +140,18 @@ const ScrollReveal = ({
   });
 
   const shouldReveal = prefersReducedMotion ? true : isVisible;
-  const sec = (n) => (n / 1000) || 0;
+  const sec = (n) => n / 1000 || 0;
 
   const variants = {
     fadeIn: {
       hidden: { opacity: 0 },
       visible: {
         opacity: 1,
-        transition: { duration: sec(duration), delay: sec(delay), ease: "easeOut" },
+        transition: {
+          duration: sec(duration),
+          delay: sec(delay),
+          ease: "easeOut",
+        },
       },
     },
     slideUp: {
@@ -153,7 +159,11 @@ const ScrollReveal = ({
       visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: sec(duration), delay: sec(delay), ease: "easeOut" },
+        transition: {
+          duration: sec(duration),
+          delay: sec(delay),
+          ease: "easeOut",
+        },
       },
     },
     scale: {
@@ -161,7 +171,11 @@ const ScrollReveal = ({
       visible: {
         opacity: 1,
         scale: 1,
-        transition: { duration: sec(duration), delay: sec(delay), ease: "easeOut" },
+        transition: {
+          duration: sec(duration),
+          delay: sec(delay),
+          ease: "easeOut",
+        },
       },
     },
   };
@@ -187,22 +201,35 @@ const ScrollReveal = ({
 export default function Projects() {
   const reduce = usePrefersReducedMotion();
   const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("All");
   const modalRef = useRef(null);
   const closeBtnRef = useRef(null);
   const lastActiveEl = useRef(null);
 
+  // Simulate loading projects data
+  const {
+    data: projectsData,
+    isLoading,
+    error,
+  } = useSkeletonAsync(async () => {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    return projects;
+  });
+
   const categories = useMemo(() => {
     const base = new Set(["All"]);
-    projects.forEach((p) => (p.tags || []).forEach((t) => base.add(t)));
+    (projectsData || projects).forEach((p) =>
+      (p.tags || []).forEach((t) => base.add(t))
+    );
     return Array.from(base);
-  }, []);
+  }, [projectsData]);
 
   const filteredProjects = useMemo(() => {
-    if (activeFilter === "All") return projects;
-    return projects.filter((p) => (p.tags || []).includes(activeFilter));
-  }, [activeFilter]);
+    const data = projectsData || projects;
+    if (activeFilter === "All") return data;
+    return data.filter((p) => (p.tags || []).includes(activeFilter));
+  }, [activeFilter, projectsData]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -260,7 +287,8 @@ export default function Projects() {
               Projects
             </h1>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 max-w-2xl">
-              A curated selection of projects — filter, explore, and open demos or repos.
+              A curated selection of projects — filter, explore, and open demos
+              or repos.
             </p>
           </header>
         </ScrollReveal>
@@ -299,12 +327,18 @@ export default function Projects() {
         </ScrollReveal>
 
         {/* Project Grid */}
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <SkeletonLoader />
-            <SkeletonLoader />
-            <SkeletonLoader />
+            {Array.from({ length: 6 }, (_, i) => (
+              <SkeletonProjectCard key={i} />
+            ))}
           </div>
+        ) : error ? (
+          <ScrollReveal variant="fadeIn" duration={500}>
+            <div className="glass rounded-lg p-6 text-center text-red-400">
+              Failed to load projects. Please refresh the page.
+            </div>
+          </ScrollReveal>
         ) : filteredProjects.length === 0 ? (
           <ScrollReveal variant="fadeIn" duration={500}>
             <div className="glass rounded-lg p-6 text-center text-gray-800 dark:text-gray-200">
@@ -420,7 +454,11 @@ export default function Projects() {
                     </button>
                   </div>
                   <div className="mt-6 text-xs text-gray-600 dark:text-gray-400">
-                    Tip: Press <kbd className="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700">Esc</kbd> to close.
+                    Tip: Press{" "}
+                    <kbd className="px-1 py-0.5 rounded bg-gray-200 dark:bg-gray-700">
+                      Esc
+                    </kbd>{" "}
+                    to close.
                   </div>
                 </div>
               </div>

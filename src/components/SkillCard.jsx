@@ -1,7 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { SkeletonBase } from "./skeleton";
 
-export default function SkillItem({ skill, index }) {
+export default function SkillItem({ skill, index, isLoading = false }) {
   const getProficiencyColor = (proficiency) => {
     switch (proficiency) {
       case "Advanced":
@@ -14,6 +15,18 @@ export default function SkillItem({ skill, index }) {
         return "text-gray-600 dark:text-gray-400";
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center space-x-3 py-2">
+        <SkeletonBase width="8px" height="8px" borderRadius="50%" />
+        <div className="flex-1 space-y-2">
+          <SkeletonBase height="14px" width="80%" />
+          <SkeletonBase height="12px" width="60%" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div

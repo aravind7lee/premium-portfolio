@@ -17,6 +17,7 @@ import {
 import ParticleBackground from "../components/ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import Profile1 from "../assets/Profile1.jpg";
+import { SkeletonArticle, useSkeletonAsync } from "../components/skeleton";
 
 /* ---------- Utility: combine class names ---------- */
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -121,7 +122,7 @@ function Reveal({
       variants={variants}
       className={cx(
         className,
-        "transition-opacity transition-transform",
+        "transition-all",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
       )}
       style={style}
@@ -136,6 +137,17 @@ function Reveal({
 export default function About() {
   let reduce = usePrefersReducedMotion();
   if (typeof reduce === "undefined") reduce = usePrefersReducedMotionFallback();
+
+  // Simulate loading about data
+  const {
+    data: aboutData,
+    isLoading,
+    error,
+  } = useSkeletonAsync(async () => {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    return { loaded: true };
+  });
 
   const person = {
     name: "Aravind Raja",
@@ -241,227 +253,260 @@ export default function About() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
-        <header className="mb-6">
-          <Reveal delay={30} duration={500} reduceMotion={reduce}>
-            <h1
-              id="about-heading"
-              className="text-3xl md:text-4xl font-extrabold"
-            >
-              About
-            </h1>
-            <p className="mt-2 text-sm text-white/70">
-              My professional journey at a glance.
-            </p>
-          </Reveal>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Profile / Contact */}
-          <aside className="order-1 md:order-1">
-            <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-              <Reveal stagger={120} duration={600} reduceMotion={reduce}>
-                <img
-                  src={Profile1}
-                  alt={`${person.name} profile`}
-                  className="w-40 h-40 md:w-48 md:h-48 object-cover rounded-2xl shadow-lg mx-auto"
-                />
-                <div className="mt-4 text-center">
-                  <h2 className="text-xl font-bold">{person.name}</h2>
-                  <div className="text-sm text-white/70 mt-1">{person.title}</div>
-
-                  <div className="mt-4 flex flex-col gap-2 w-full">
-                    <a
-                      href={`mailto:${person.email}`}
-                      className="inline-flex items-center gap-2 justify-center px-4 py-2 rounded-md glass"
-                    >
-                      <FaEnvelope /> {person.email}
-                    </a>
-
-                    <a
-                      href={`tel:${person.phone}`}
-                      className="inline-flex items-center gap-2 justify-center px-4 py-2 rounded-md glass"
-                    >
-                      <FaPhone /> {person.phone}
-                    </a>
-
-                    <div className="flex items-center justify-center gap-3 mt-2">
-                      <a
-                        aria-label="GitHub"
-                        href={person.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-md glass"
-                      >
-                        <FaGithub />
-                      </a>
-                      <a
-                        aria-label="LinkedIn"
-                        href={person.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-md glass"
-                      >
-                        <FaLinkedin />
-                      </a>
-                      <a
-                        aria-label="Portfolio"
-                        href={person.portfolio}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-md glass"
-                      >
-                        <FaExternalLinkAlt />
-                      </a>
-                    </div>
-
-                    <a
-                      href="/Aravind R-Updated-Resume.pdf"
-                      download
-                      className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold"
-                    >
-                      Download Resume
-                    </a>
-                  </div>
-                </div>
-              </Reveal>
+        {isLoading ? (
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="h-8 bg-gray-300 rounded-lg w-32 animate-pulse"></div>
+              <div className="h-4 bg-gray-300 rounded-lg w-64 animate-pulse"></div>
             </div>
-          </aside>
-
-          {/* Main content */}
-          <section className="order-2 md:order-2 md:col-span-2 space-y-6">
-            {/* Summary */}
-            <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-              <Reveal duration={700} reduceMotion={reduce}>
-                <h3 className="text-lg font-semibold mb-2">Summary</h3>
-                <p className="text-white/80 leading-relaxed">{person.summary}</p>
+            <SkeletonArticle />
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-400">
+            <p>Failed to load about content. Please refresh the page.</p>
+          </div>
+        ) : (
+          <>
+            <header className="mb-6">
+              <Reveal delay={30} duration={500} reduceMotion={reduce}>
+                <h1
+                  id="about-heading"
+                  className="text-3xl md:text-4xl font-extrabold"
+                >
+                  About
+                </h1>
+                <p className="mt-2 text-sm text-white/70">
+                  My professional journey at a glance.
+                </p>
               </Reveal>
-            </div>
+            </header>
 
-            {/* Skills */}
-            <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-              <Reveal stagger={60} duration={600} reduceMotion={reduce}>
-                <h3 className="text-lg font-semibold mb-3">Skills</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <div className="text-xs text-white/60 mb-2">Front-End</div>
-                    <div className="flex flex-wrap gap-2">
-                      {person.skills.frontend.map((s) => chip(s))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-white/60 mb-2">Back-End & DB</div>
-                    <div className="flex flex-wrap gap-2">
-                      {person.skills.backend.map((s) => chip(s))}
-                      {person.skills.db.map((s) => chip(s))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-white/60 mb-2">
-                      Languages & Tools
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {person.skills.languages.map((s) => chip(s))}
-                      {person.skills.tools.map((s) => chip(s))}
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 text-xs text-white/60">
-                  <strong>Soft skills:</strong> {person.skills.soft.join(", ")}
-                </div>
-              </Reveal>
-            </div>
-
-            {/* Experience */}
-            <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-              <h3 className="text-lg font-semibold mb-4">Experience</h3>
-              <div className="space-y-4">
-                {person.experiences.map((exp, idx) => (
-                  <Reveal
-                    key={exp.company}
-                    delay={idx * 150}
-                    duration={650}
-                    reduceMotion={reduce}
-                  >
-                    <div className="flex items-baseline justify-between">
-                      <div>
-                        <div className="font-medium">{exp.role}</div>
-                        <div className="text-xs text-white/70">
-                          {exp.company}
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Profile / Contact */}
+              <aside className="order-1 md:order-1">
+                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                  <Reveal stagger={120} duration={600} reduceMotion={reduce}>
+                    <img
+                      src={Profile1}
+                      alt={`${person.name} profile`}
+                      className="w-40 h-40 md:w-48 md:h-48 object-cover rounded-2xl shadow-lg mx-auto"
+                    />
+                    <div className="mt-4 text-center">
+                      <h2 className="text-xl font-bold">{person.name}</h2>
+                      <div className="text-sm text-white/70 mt-1">
+                        {person.title}
                       </div>
-                      <div className="text-xs text-white/60">{exp.period}</div>
-                    </div>
-                    <ul className="mt-2 ml-4 list-disc text-white/70 space-y-1">
-                      {exp.bullets.map((b, i) => (
-                        <li key={i}>{b}</li>
-                      ))}
-                    </ul>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
 
-            {/* Projects */}
-            <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-              <Reveal stagger={80} reduceMotion={reduce}>
-                <h3 className="text-lg font-semibold mb-3">Selected projects</h3>
-                <div className="space-y-4">
-                  {person.projects.map((p) => (
-                    <div
-                      key={p.name}
-                      className="md:flex md:justify-between md:items-start"
-                    >
-                      <div>
+                      <div className="mt-4 flex flex-col gap-2 w-full">
                         <a
-                          href={p.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium inline-flex items-center gap-2 hover:underline"
+                          href={`mailto:${person.email}`}
+                          className="inline-flex items-center gap-2 justify-center px-4 py-2 rounded-md glass"
                         >
-                          {p.name} <FaExternalLinkAlt className="text-xs" />
+                          <FaEnvelope /> {person.email}
                         </a>
-                        <p className="text-xs text-white/70 mt-1">{p.details}</p>
+
+                        <a
+                          href={`tel:${person.phone}`}
+                          className="inline-flex items-center gap-2 justify-center px-4 py-2 rounded-md glass"
+                        >
+                          <FaPhone /> {person.phone}
+                        </a>
+
+                        <div className="flex items-center justify-center gap-3 mt-2">
+                          <a
+                            aria-label="GitHub"
+                            href={person.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-md glass"
+                          >
+                            <FaGithub />
+                          </a>
+                          <a
+                            aria-label="LinkedIn"
+                            href={person.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-md glass"
+                          >
+                            <FaLinkedin />
+                          </a>
+                          <a
+                            aria-label="Portfolio"
+                            href={person.portfolio}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-md glass"
+                          >
+                            <FaExternalLinkAlt />
+                          </a>
+                        </div>
+
+                        <a
+                          href="/Aravind R-Updated-Resume.pdf"
+                          download
+                          className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold"
+                        >
+                          Download Resume
+                        </a>
                       </div>
                     </div>
-                  ))}
+                  </Reveal>
                 </div>
-              </Reveal>
-            </div>
+              </aside>
 
-            {/* Education & Certifications */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-                <Reveal duration={650} reduceMotion={reduce}>
-                  <h3 className="text-lg font-semibold mb-3">Education</h3>
-                  <div className="space-y-3 text-sm">
-                    {person.education.map((edu) => (
-                      <div key={edu.degree}>
-                        <div className="font-medium">{edu.degree}</div>
-                        <div className="text-xs text-white/70">
-                          {edu.institute}
+              {/* Main content */}
+              <section className="order-2 md:order-2 md:col-span-2 space-y-6">
+                {/* Summary */}
+                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                  <Reveal duration={700} reduceMotion={reduce}>
+                    <h3 className="text-lg font-semibold mb-2">Summary</h3>
+                    <p className="text-white/80 leading-relaxed">
+                      {person.summary}
+                    </p>
+                  </Reveal>
+                </div>
+
+                {/* Skills */}
+                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                  <Reveal stagger={60} duration={600} reduceMotion={reduce}>
+                    <h3 className="text-lg font-semibold mb-3">Skills</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <div className="text-xs text-white/60 mb-2">
+                          Front-End
                         </div>
-                        <div className="text-xs text-white/60">
-                          {edu.years} • CGPA: {edu.cgpa}
+                        <div className="flex flex-wrap gap-2">
+                          {person.skills.frontend.map((s) => chip(s))}
                         </div>
                       </div>
+                      <div>
+                        <div className="text-xs text-white/60 mb-2">
+                          Back-End & DB
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {person.skills.backend.map((s) => chip(s))}
+                          {person.skills.db.map((s) => chip(s))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-white/60 mb-2">
+                          Languages & Tools
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {person.skills.languages.map((s) => chip(s))}
+                          {person.skills.tools.map((s) => chip(s))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 text-xs text-white/60">
+                      <strong>Soft skills:</strong>{" "}
+                      {person.skills.soft.join(", ")}
+                    </div>
+                  </Reveal>
+                </div>
+
+                {/* Experience */}
+                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                  <h3 className="text-lg font-semibold mb-4">Experience</h3>
+                  <div className="space-y-4">
+                    {person.experiences.map((exp, idx) => (
+                      <Reveal
+                        key={exp.company}
+                        delay={idx * 150}
+                        duration={650}
+                        reduceMotion={reduce}
+                      >
+                        <div className="flex items-baseline justify-between">
+                          <div>
+                            <div className="font-medium">{exp.role}</div>
+                            <div className="text-xs text-white/70">
+                              {exp.company}
+                            </div>
+                          </div>
+                          <div className="text-xs text-white/60">
+                            {exp.period}
+                          </div>
+                        </div>
+                        <ul className="mt-2 ml-4 list-disc text-white/70 space-y-1">
+                          {exp.bullets.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      </Reveal>
                     ))}
                   </div>
-                </Reveal>
-              </div>
+                </div>
 
-              <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
-                <Reveal duration={650} reduceMotion={reduce}>
-                  <h3 className="text-lg font-semibold mb-3">Certifications</h3>
-                  <ul className="list-disc list-inside text-sm text-white/80 space-y-1">
-                    {person.certifications.map((c) => (
-                      <li key={c}>{c}</li>
-                    ))}
-                  </ul>
-                </Reveal>
-              </div>
+                {/* Projects */}
+                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                  <Reveal stagger={80} reduceMotion={reduce}>
+                    <h3 className="text-lg font-semibold mb-3">
+                      Selected projects
+                    </h3>
+                    <div className="space-y-4">
+                      {person.projects.map((p) => (
+                        <div
+                          key={p.name}
+                          className="md:flex md:justify-between md:items-start"
+                        >
+                          <div>
+                            <a
+                              href={p.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm font-medium inline-flex items-center gap-2 hover:underline"
+                            >
+                              {p.name} <FaExternalLinkAlt className="text-xs" />
+                            </a>
+                            <p className="text-xs text-white/70 mt-1">
+                              {p.details}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Reveal>
+                </div>
+
+                {/* Education & Certifications */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                    <Reveal duration={650} reduceMotion={reduce}>
+                      <h3 className="text-lg font-semibold mb-3">Education</h3>
+                      <div className="space-y-3 text-sm">
+                        {person.education.map((edu) => (
+                          <div key={edu.degree}>
+                            <div className="font-medium">{edu.degree}</div>
+                            <div className="text-xs text-white/70">
+                              {edu.institute}
+                            </div>
+                            <div className="text-xs text-white/60">
+                              {edu.years} • CGPA: {edu.cgpa}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Reveal>
+                  </div>
+
+                  <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                    <Reveal duration={650} reduceMotion={reduce}>
+                      <h3 className="text-lg font-semibold mb-3">
+                        Certifications
+                      </h3>
+                      <ul className="list-disc list-inside text-sm text-white/80 space-y-1">
+                        {person.certifications.map((c) => (
+                          <li key={c}>{c}</li>
+                        ))}
+                      </ul>
+                    </Reveal>
+                  </div>
+                </div>
+              </section>
             </div>
-          </section>
-        </div>
+          </>
+        )}
       </div>
     </motion.main>
   );

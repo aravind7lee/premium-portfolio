@@ -5,6 +5,7 @@ import ContactForm from "../components/ContactForm";
 import ParticleBackground from "../components/ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
+import { SkeletonCard, useSkeletonAsync } from "../components/skeleton";
 
 /* -----------------------
    Config: Ultra-smooth forced ON
@@ -17,7 +18,8 @@ const ULTRA_SMOOTH = true;
 const cx = (...args) => args.filter(Boolean).join(" ");
 
 function safeMatchMedia(query) {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function")
+    return false;
   try {
     return window.matchMedia(query).matches;
   } catch {
@@ -26,9 +28,16 @@ function safeMatchMedia(query) {
 }
 
 function connectionInfo() {
-  if (typeof navigator === "undefined") return { saveData: false, effectiveType: "" };
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  return { saveData: !!(conn && conn.saveData), effectiveType: (conn && conn.effectiveType) || "" };
+  if (typeof navigator === "undefined")
+    return { saveData: false, effectiveType: "" };
+  const conn =
+    navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection;
+  return {
+    saveData: !!(conn && conn.saveData),
+    effectiveType: (conn && conn.effectiveType) || "",
+  };
 }
 
 /* -----------------------
@@ -37,12 +46,18 @@ function connectionInfo() {
    ----------------------- */
 const observerRegistry = new Map();
 
-function useIntersectionSimple({ threshold = 0.12, rootMargin = "0px 0px -8% 0px", once = false } = {}) {
+function useIntersectionSimple({
+  threshold = 0.12,
+  rootMargin = "0px 0px -8% 0px",
+  once = false,
+} = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const elRef = useRef(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const key = `${Array.isArray(threshold) ? threshold.join(",") : threshold}|${rootMargin}`;
+  const key = `${
+    Array.isArray(threshold) ? threshold.join(",") : threshold
+  }|${rootMargin}`;
 
   const unregister = useCallback(
     (el) => {
@@ -160,7 +175,11 @@ const Reveal = ({
   style = {},
   ...props
 }) => {
-  const [ref, isVisible] = useIntersectionSimple({ threshold, rootMargin, once });
+  const [ref, isVisible] = useIntersectionSimple({
+    threshold,
+    rootMargin,
+    once,
+  });
   const hookPref = usePrefersReducedMotion();
   const prefersReducedMotion = typeof hookPref === "boolean" ? hookPref : false;
 
@@ -197,11 +216,27 @@ const Reveal = ({
 /* -----------------------
    StaggerReveal: group-based staggering (no per-child observers)
    ----------------------- */
-const StaggerReveal = ({ children, staggerDelay = 0.06, variant = "fade-up", duration = 0.36, className = "", ...props }) => {
-  const [containerRef, containerVisible] = useIntersectionSimple({ threshold: 0.12, rootMargin: "0px 0px -8% 0px", once: false });
+const StaggerReveal = ({
+  children,
+  staggerDelay = 0.06,
+  variant = "fade-up",
+  duration = 0.36,
+  className = "",
+  ...props
+}) => {
+  const [containerRef, containerVisible] = useIntersectionSimple({
+    threshold: 0.12,
+    rootMargin: "0px 0px -8% 0px",
+    once: false,
+  });
 
   return (
-    <div ref={containerRef} className={`stagger-reveal ${className}`} data-visible={containerVisible ? "true" : "false"} {...props}>
+    <div
+      ref={containerRef}
+      className={`stagger-reveal ${className}`}
+      data-visible={containerVisible ? "true" : "false"}
+      {...props}
+    >
       {React.Children.map(children, (child, idx) => {
         const delay = idx * staggerDelay;
         return (
@@ -232,6 +267,17 @@ const StaggerReveal = ({ children, staggerDelay = 0.06, variant = "fade-up", dur
 export default function Contact() {
   const hookPref = usePrefersReducedMotion();
   const prefersReducedMotion = typeof hookPref === "boolean" ? hookPref : false;
+
+  // Simulate loading contact data
+  const {
+    data: contactData,
+    isLoading,
+    error,
+  } = useSkeletonAsync(async () => {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    return { loaded: true };
+  });
 
   // Ensure global ultra-smooth classes (pause particles, reduce heavy CSS)
   useEffect(() => {
@@ -321,7 +367,11 @@ export default function Contact() {
         aria-labelledby="contact-heading"
       >
         {/* Background aura (cheap; uses transform & blur only) */}
-        <div aria-hidden className="absolute inset-0 -z-20 pointer-events-none" style={{ mixBlendMode: "screen" }}>
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-20 pointer-events-none"
+          style={{ mixBlendMode: "screen" }}
+        >
           <div
             style={{
               position: "absolute",
@@ -343,116 +393,163 @@ export default function Contact() {
         </div>
 
         <div className="max-w-6xl mx-auto px-6 py-12 contact-grid">
-          {/* Header */}
-          <header className="mb-8">
-            <Reveal variant="zoom-in" delay={0.06} duration={0.36}>
-              <h1 id="contact-heading" className="text-3xl md:text-4xl font-extrabold">
-                Contact
-              </h1>
-              <p className="mt-2 text-sm text-white/80 max-w-xl">
-                Have a question, collaboration idea, or want to say hi? Drop a message.
-              </p>
-            </Reveal>
-          </header>
-
-          {/* Grid layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            {/* Left: Contact form */}
-            <Reveal variant="fade-up" delay={0.12}>
-              <div className="w-full h-full card-smooth">
-                {/* contact form should be optimized inside component: avoid heavy animation in ContactForm */}
-                <ContactForm />
+          {isLoading ? (
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="h-8 bg-gray-300 rounded-lg w-32 animate-pulse"></div>
+                <div className="h-4 bg-gray-300 rounded-lg w-96 animate-pulse"></div>
               </div>
-            </Reveal>
-
-            {/* Right: Details */}
-            <Reveal variant="slide-left" delay={0.16}>
-              <aside className="space-y-6 w-full">
-                <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
-                  <h2 className="text-lg font-semibold mb-3">Contact details</h2>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex items-start gap-3">
-                      <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
-                        <FaEnvelope />
-                      </span>
-                      <div>
-                        <div className="font-medium">Email</div>
-                        <a className="text-sm text-white/80 hover:underline" href="mailto:aravindrajaa03@gmail.com">
-                          aravindrajaa03@gmail.com
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
-                        <FaPhone />
-                      </span>
-                      <div>
-                        <div className="font-medium">Phone</div>
-                        <a className="text-sm text-white/80 hover:underline" href="tel:9384605406">
-                          +91 93846 05406
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
-                        <FaMapMarkerAlt />
-                      </span>
-                      <div>
-                        <div className="font-medium">Location</div>
-                        <div className="text-sm text-white/80">Chennai, Tamil Nadu, India</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
-                  <h3 className="font-semibold">Availability</h3>
-                  <p className="mt-2 text-sm text-white/80">
-                    Open to full-time and contract opportunities. Available for projects, mentorship, and collaborations,
-                    especially around MERN/PERN, UI/UX and performance engineering.
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <SkeletonCard
+                  height="400px"
+                  showImage={false}
+                  showText={true}
+                  showButton={true}
+                  className="glass rounded-lg p-6"
+                />
+                <SkeletonCard
+                  height="400px"
+                  showImage={false}
+                  showText={true}
+                  showButton={false}
+                  className="glass rounded-lg p-6"
+                />
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-400">
+              <p>Failed to load contact content. Please refresh the page.</p>
+            </div>
+          ) : (
+            <>
+              {/* Header */}
+              <header className="mb-8">
+                <Reveal variant="zoom-in" delay={0.06} duration={0.36}>
+                  <h1
+                    id="contact-heading"
+                    className="text-3xl md:text-4xl font-extrabold"
+                  >
+                    Contact
+                  </h1>
+                  <p className="mt-2 text-sm text-white/80 max-w-xl">
+                    Have a question, collaboration idea, or want to say hi? Drop
+                    a message.
                   </p>
-                </div>
+                </Reveal>
+              </header>
 
-                <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
-                  <h3 className="font-semibold">Quick links</h3>
-                  <div className="mt-3 flex flex-wrap items-center gap-3">
-                    <a
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md glass text-sm"
-                      href="https://github.com/aravind7lee"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      GitHub
-                    </a>
-                    <a
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md glass text-sm"
-                      href="https://www.linkedin.com/in/aravind042"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      LinkedIn
-                    </a>
-                    <a
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black text-sm font-semibold"
-                      href="/Aravind R-Updated-Resume.pdf"
-                      download
-                    >
-                      Resume
-                    </a>
+              {/* Grid layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                {/* Left: Contact form */}
+                <Reveal variant="fade-up" delay={0.12}>
+                  <div className="w-full h-full card-smooth">
+                    {/* contact form should be optimized inside component: avoid heavy animation in ContactForm */}
+                    <ContactForm />
                   </div>
-                </div>
-              </aside>
-            </Reveal>
-          </div>
+                </Reveal>
 
-          {/* Footer */}
-          <Reveal variant="fade-up" delay={0.2}>
-            <p className="mt-8 text-xs text-white/60">
-              By contacting me you agree to keep things professional — I respond to reasonable messages and respect your privacy.
-            </p>
-          </Reveal>
+                {/* Right: Details */}
+                <Reveal variant="slide-left" delay={0.16}>
+                  <aside className="space-y-6 w-full">
+                    <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
+                      <h2 className="text-lg font-semibold mb-3">
+                        Contact details
+                      </h2>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-start gap-3">
+                          <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
+                            <FaEnvelope />
+                          </span>
+                          <div>
+                            <div className="font-medium">Email</div>
+                            <a
+                              className="text-sm text-white/80 hover:underline"
+                              href="mailto:aravindrajaa03@gmail.com"
+                            >
+                              aravindrajaa03@gmail.com
+                            </a>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
+                            <FaPhone />
+                          </span>
+                          <div>
+                            <div className="font-medium">Phone</div>
+                            <a
+                              className="text-sm text-white/80 hover:underline"
+                              href="tel:9384605406"
+                            >
+                              +91 93846 05406
+                            </a>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
+                            <FaMapMarkerAlt />
+                          </span>
+                          <div>
+                            <div className="font-medium">Location</div>
+                            <div className="text-sm text-white/80">
+                              Chennai, Tamil Nadu, India
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
+                      <h3 className="font-semibold">Availability</h3>
+                      <p className="mt-2 text-sm text-white/80">
+                        Open to full-time and contract opportunities. Available
+                        for projects, mentorship, and collaborations, especially
+                        around MERN/PERN, UI/UX and performance engineering.
+                      </p>
+                    </div>
+
+                    <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
+                      <h3 className="font-semibold">Quick links</h3>
+                      <div className="mt-3 flex flex-wrap items-center gap-3">
+                        <a
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md glass text-sm"
+                          href="https://github.com/aravind7lee"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          GitHub
+                        </a>
+                        <a
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md glass text-sm"
+                          href="https://www.linkedin.com/in/aravind042"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          LinkedIn
+                        </a>
+                        <a
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black text-sm font-semibold"
+                          href="/Aravind R-Updated-Resume.pdf"
+                          download
+                        >
+                          Resume
+                        </a>
+                      </div>
+                    </div>
+                  </aside>
+                </Reveal>
+              </div>
+
+              {/* Footer */}
+              <Reveal variant="fade-up" delay={0.2}>
+                <p className="mt-8 text-xs text-white/60">
+                  By contacting me you agree to keep things professional — I
+                  respond to reasonable messages and respect your privacy.
+                </p>
+              </Reveal>
+            </>
+          )}
         </div>
       </motion.main>
     </>

@@ -8,6 +8,7 @@ import ProjectCard from "../components/ProjectCard";
 import { useNavigate } from "react-router-dom";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import ParticleBackground from "../components/ParticleBackground"; // should accept `paused` prop
+import { SkeletonHero, SkeletonProjectCard, SkeletonText, SkeletonButton, SkeletonCard, useSkeletonAsync } from "../components/skeleton";
 
 /**
  * Home.jsx — Ultra-Smooth mode ALWAYS ON (no visible toggle)
@@ -174,8 +175,70 @@ export default function Home() {
   // navigation helper
   const openProjects = () => navigate("/projects");
 
+  // Skeleton loading for Hero section
+  const {
+    data: heroData,
+    isLoading: heroLoading,
+    error: heroError,
+  } = useSkeletonAsync(async () => {
+    // Simulate loading hero data - optimized 1.5 second loading time
+    console.log('Hero skeleton loading started...');
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    console.log('Hero skeleton loading finished!');
+    return {
+      loaded: true,
+    };
+  });
+
+  // Skeleton loading for featured projects
+  const {
+    data: projectsData,
+    isLoading: projectsLoading,
+    error: projectsError,
+  } = useSkeletonAsync(async () => {
+    // Simulate loading projects data - increased time to make skeleton visible
+    console.log('Projects skeleton loading started...');
+    await new Promise((resolve) => setTimeout(resolve, 3500));
+    console.log('Projects skeleton loading finished!');
+    return projects.slice(0, 3);
+  });
+
+  // Skeleton loading for About section
+  const {
+    data: aboutData,
+    isLoading: aboutLoading,
+    error: aboutError,
+  } = useSkeletonAsync(async () => {
+    // Simulate loading about data
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    return {
+      loaded: true,
+    };
+  });
+
+  // Skeleton loading for CTA section
+  const {
+    data: ctaData,
+    isLoading: ctaLoading,
+    error: ctaError,
+  } = useSkeletonAsync(async () => {
+    // Simulate loading CTA data
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    return {
+      loaded: true,
+    };
+  });
+
   // helper for motion state (if reduced motion, always "visible")
   const animState = (visible) => (reduce ? "visible" : visible ? "visible" : "hidden");
+
+  // Debug logging
+  console.log('Home page loading states:', {
+    heroLoading,
+    projectsLoading,
+    aboutLoading,
+    ctaLoading
+  });
 
   /* -----------------------
      Scroll reveal refs
@@ -247,7 +310,15 @@ export default function Home() {
           aria-label="Hero section"
         >
           <div style={{ willChange: "transform, opacity" }}>
-            <Hero />
+            {heroLoading ? (
+              <SkeletonHero className="min-h-[70vh] md:min-h-[85vh] flex items-center" />
+            ) : heroError ? (
+              <div className="min-h-[70vh] md:min-h-[85vh] flex items-center justify-center text-red-400">
+                Failed to load hero section. Please refresh the page.
+              </div>
+            ) : (
+              <Hero />
+            )}
           </div>
         </Motion.section>
 
@@ -272,18 +343,30 @@ export default function Home() {
           </div>
 
           {/* Staggered children */}
-          <Motion.div
-            variants={reduce ? {} : variants.staggerParent}
-            initial="hidden"
-            animate={animState(projectsVisible)}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          >
-            {projects.slice(0, 3).map((p) => (
-              <Motion.div key={p.id} variants={reduce ? {} : variants.fadeUp} style={{ willChange: "transform, opacity" }}>
-                <ProjectCard project={p} onOpen={openProjects} />
-              </Motion.div>
-            ))}
-          </Motion.div>
+          {projectsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }, (_, i) => (
+                <SkeletonProjectCard key={i} />
+              ))}
+            </div>
+          ) : projectsError ? (
+            <div className="glass rounded-lg p-6 text-center text-red-400">
+              Failed to load projects. Please refresh the page.
+            </div>
+          ) : (
+            <Motion.div
+              variants={reduce ? {} : variants.staggerParent}
+              initial="hidden"
+              animate={animState(projectsVisible)}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              {(projectsData || projects.slice(0, 3)).map((p) => (
+                <Motion.div key={p.id} variants={reduce ? {} : variants.fadeUp} style={{ willChange: "transform, opacity" }}>
+                  <ProjectCard project={p} onOpen={openProjects} />
+                </Motion.div>
+              ))}
+            </Motion.div>
+          )}
         </Motion.section>
 
         {/* About Section */}
@@ -295,77 +378,102 @@ export default function Home() {
           className="max-w-6xl mx-auto px-6 my-24"
           aria-label="About me"
         >
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* About text */}
-            <Motion.div variants={reduce ? {} : variants.fadeUp} style={{ willChange: "transform, opacity" }}>
-              <h3 className="text-2xl md:text-3xl mb-6 font-bold bg-clip-text">About Me</h3>
-              <p className="mt-3 text-white/80 text-lg leading-relaxed">
-                I'm a passionate developer who builds production-ready applications with a focus on exceptional UX, performance,
-                and beautiful animations. I prioritize accessible, maintainable code complemented by engaging microinteractions.
-              </p>
+          {aboutLoading ? (
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              {/* About text skeleton */}
+              <div className="space-y-6">
+                <SkeletonText lines={1} lineHeight="2.5rem" className="mb-6" />
+                <SkeletonText lines={4} lineHeight="1.5rem" />
+                <div className="mt-8">
+                  <SkeletonButton width="150px" height="3rem" />
+                </div>
+              </div>
+              {/* Education skeleton */}
+              <SkeletonCard 
+                height="400px" 
+                className="glass rounded-xl backdrop-blur-lg" 
+                showImage={false} 
+                showText={true} 
+                showButton={false} 
+              />
+            </div>
+          ) : aboutError ? (
+            <div className="glass rounded-lg p-6 text-center text-red-400">
+              Failed to load about section. Please refresh the page.
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              {/* About text */}
+              <Motion.div variants={reduce ? {} : variants.fadeUp} style={{ willChange: "transform, opacity" }}>
+                <h3 className="text-2xl md:text-3xl mb-6 font-bold bg-clip-text">About Me</h3>
+                <p className="mt-3 text-white/80 text-lg leading-relaxed">
+                  I'm a passionate developer who builds production-ready applications with a focus on exceptional UX, performance,
+                  and beautiful animations. I prioritize accessible, maintainable code complemented by engaging microinteractions.
+                </p>
 
-              <Motion.div
-                className="mt-8"
-                whileHover={reduce ? {} : { scale: 1.01 }}
-                whileTap={reduce ? {} : { scale: 0.98 }}
-                style={{ willChange: "transform" }}
-              >
-                <button
-                  onClick={() => navigate("/about")}
-                  className="px-6 py-3 rounded-lg glass transition-all duration-300 hover:shadow-lg flex items-center group"
-                  aria-label="Learn more about me"
+                <Motion.div
+                  className="mt-8"
+                  whileHover={reduce ? {} : { scale: 1.01 }}
+                  whileTap={reduce ? {} : { scale: 0.98 }}
+                  style={{ willChange: "transform" }}
                 >
-                  Learn more
-                  <svg
-                    className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <button
+                    onClick={() => navigate("/about")}
+                    className="px-6 py-3 rounded-lg glass transition-all duration-300 hover:shadow-lg flex items-center group"
+                    aria-label="Learn more about me"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                    Learn more
+                    <svg
+                      className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </Motion.div>
               </Motion.div>
-            </Motion.div>
 
-            {/* Education Section (Replacing Timeline) */}
-            <Motion.div
-              ref={timelineRef}
-              variants={reduce ? {} : variants.slideInRight}
-              initial="hidden"
-              animate={animState(timelineVisible)}
-              className="glass rounded-xl p-8 backdrop-blur-lg"
-              style={{ willChange: "transform, opacity" }}
-            >
-              {/* Section Heading */}
-              <h4 className="font-bold text-2xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Education</h4>
+              {/* Education Section (Replacing Timeline) */}
+              <Motion.div
+                ref={timelineRef}
+                variants={reduce ? {} : variants.slideInRight}
+                initial="hidden"
+                animate={animState(timelineVisible)}
+                className="glass rounded-xl p-8 backdrop-blur-lg"
+                style={{ willChange: "transform, opacity" }}
+              >
+                {/* Section Heading */}
+                <h4 className="font-bold text-2xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Education</h4>
 
-              {/* Education List */}
-              <ul className="space-y-8">
-                {/* MCA */}
-                <Motion.li variants={reduce ? {} : variants.fadeIn} className="relative pl-8 border-l-2 border-white/20">
-                  <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-md shadow-blue-500/40"></div>
+                {/* Education List */}
+                <ul className="space-y-8">
+                  {/* MCA */}
+                  <Motion.li variants={reduce ? {} : variants.fadeIn} className="relative pl-8 border-l-2 border-white/20">
+                    <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-md shadow-blue-500/40"></div>
 
-                  <strong className="block text-lg font-semibold text-white">Master of Computer Application (MCA)</strong>
+                    <strong className="block text-lg font-semibold text-white">Master of Computer Application (MCA)</strong>
 
-                  <span className="block text-white/80 italic">SRM Institute of Science and Technology, Chennai</span>
+                    <span className="block text-white/80 italic">SRM Institute of Science and Technology, Chennai</span>
 
-                  <p className="mt-1 text-white/70">2023 – 2025 • <span className="font-medium">CGPA: 9.73</span></p>
-                </Motion.li>
+                    <p className="mt-1 text-white/70">2023 – 2025 • <span className="font-medium">CGPA: 9.73</span></p>
+                  </Motion.li>
 
-                {/* BCA */}
-                <Motion.li variants={reduce ? {} : variants.fadeIn} className="relative pl-8 border-l-2 border-white/20">
-                  <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-pink-500 to-red-500 shadow-md shadow-pink-500/40"></div>
+                  {/* BCA */}
+                  <Motion.li variants={reduce ? {} : variants.fadeIn} className="relative pl-8 border-l-2 border-white/20">
+                    <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-pink-500 to-red-500 shadow-md shadow-pink-500/40"></div>
 
-                  <strong className="block text-lg font-semibold text-white">Bachelor of Computer Application (BCA)</strong>
+                    <strong className="block text-lg font-semibold text-white">Bachelor of Computer Application (BCA)</strong>
 
-                  <span className="block text-white/80 italic">SRM Institute of Science and Technology, Chennai</span>
+                    <span className="block text-white/80 italic">SRM Institute of Science and Technology, Chennai</span>
 
-                  <p className="mt-1 text-white/70">2020 – 2023 • <span className="font-medium">CGPA: 9.30</span></p>
-                </Motion.li>
-              </ul>
-            </Motion.div>
-          </div>
+                    <p className="mt-1 text-white/70">2020 – 2023 • <span className="font-medium">CGPA: 9.30</span></p>
+                  </Motion.li>
+                </ul>
+              </Motion.div>
+            </div>
+          )}
         </Motion.section>
 
         {/* CTA Section */}
@@ -376,7 +484,21 @@ export default function Home() {
           animate={animState(ctaVisible)}
           className="max-w-6xl mx-auto px-6 my-16"
         >
-          <CtaBanner />
+          {ctaLoading ? (
+            <SkeletonCard 
+              height="200px" 
+              className="glass rounded-xl backdrop-blur-lg" 
+              showImage={false} 
+              showText={true} 
+              showButton={true} 
+            />
+          ) : ctaError ? (
+            <div className="glass rounded-lg p-6 text-center text-red-400">
+              Failed to load CTA section. Please refresh the page.
+            </div>
+          ) : (
+            <CtaBanner />
+          )}
         </Motion.section>
       </Motion.main>
     </>
