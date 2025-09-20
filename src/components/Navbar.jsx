@@ -542,55 +542,76 @@ export default function Navbar() {
         {/* Desktop */}
         <div className="hidden md:flex gap-4 items-center">
           <div className="flex gap-1">
-            {links.map((l) => (
-              <ScrollReveal
-                key={l.to}
-                as={Link}
-                to={l.to}
-                className="px-3 py-2 rounded-md text-sm text-white/90 hover:text-white transition"
-                variants={{
-                  hidden: { opacity: 0, y: -20 },
-                  visible: {
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      duration: reducedMotion ? 0 : 0.5,
-                      ease: "easeOut",
-                    },
-                  },
-                }}
-                revealOptions={{ margin: "0px 0px -10% 0px" }}
-              >
-                {l.label}
-              </ScrollReveal>
-            ))}
+            {links.map((l) => {
+              const isActive = location.pathname === l.to;
+              return (
+                <motion.div key={l.to} className="relative group">
+                  <Link
+                    to={l.to}
+                    className={`relative block px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 overflow-hidden border ${
+                      isActive 
+                        ? "text-white bg-gradient-to-r from-purple-600/40 to-teal-400/40 border-purple-500/30 shadow-lg shadow-purple-500/20" 
+                        : "text-white/70 hover:text-white border-transparent hover:border-purple-500/20"
+                    }`}
+                  >
+                    {/* Strong hover background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/50 to-teal-400/50 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
+                    
+                    {/* Enhanced glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-teal-400/30 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
+                    
+                    {/* Prominent animated gradient underline */}
+                    <div className="absolute bottom-1 left-2 right-2 h-1 bg-gradient-to-r from-purple-400 via-pink-400 to-teal-400 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 ease-out origin-left shadow-lg shadow-purple-400/60" />
+                    
+                    {/* Shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
+                    
+                    {/* Active indicator */}
+                    {isActive && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50" />
+                    )}
+                    
+                    {/* Enhanced text content */}
+                    <span className="relative z-10 transition-all duration-300 group-hover:text-white group-hover:font-semibold group-hover:drop-shadow-lg">
+                      {l.label}
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
 
-          <div className="ml-1 mr-1">
-            <ThemeToggle className="text-white" />
+          <div className="ml-3 mr-3">
+            <ThemeToggle />
           </div>
 
-          <ScrollReveal
-            as="a"
-            href="/Aravind R-Updated-Resume.pdf"
-            download
-            className="ml-2 px-4 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold shadow transform-gpu transition-transform duration-150"
-            aria-label="Download resume"
-            variants={{
-              hidden: { opacity: 0, scale: 0.8 },
-              visible: {
-                opacity: 1,
-                scale: 1,
-                transition: {
-                  duration: reducedMotion ? 0 : 0.6,
-                  ease: "easeOut",
-                },
-              },
+          <motion.div 
+            className="relative group"
+            whileHover={reducedMotion ? {} : {
+              scale: 1.05,
+              y: -2,
+              transition: { duration: 0.2, ease: "easeOut" }
             }}
-            revealOptions={{ margin: "0px 0px -10% 0px" }}
+            whileTap={reducedMotion ? {} : {
+              scale: 0.96,
+              transition: { duration: 0.1 }
+            }}
           >
-            Resume
-          </ScrollReveal>
+            <a
+              href="/Aravind R-Updated-Resume.pdf"
+              download
+              className="relative block px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transform-gpu transition-all duration-300 overflow-hidden"
+              aria-label="Download resume"
+            >
+              {/* Clean glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-teal-400/30 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl" />
+              
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-600 ease-out rounded-xl" />
+              
+              <span className="relative z-10 transition-all duration-300 group-hover:drop-shadow-lg">Resume</span>
+            </a>
+          </motion.div>
         </div>
 
         {/* Mobile controls */}
