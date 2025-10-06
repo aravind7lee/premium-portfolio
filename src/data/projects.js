@@ -6,8 +6,21 @@ import work3 from "../assets/work-3.png";
 import work4 from "../assets/work-4.png";
 import work5 from "../assets/work-5.png";
 import work6 from "../assets/work-6.jpg";
+import work7 from "../assets/work-7.png";
 
 const projects = [
+  {
+    id: "grindx",
+    title: "GRIND-x — Full-Stack Fitness App (MERN)",
+    summary:
+      "Comprehensive fitness tracking web application with real-time workout tracking, nutrition monitoring, and custom workout plan management.",
+    tags: ["MongoDB", "Express.js", "React.js", "Node.js", "JWT", "Cloudinary"],
+    image: work7,
+    details:
+      "Full-stack fitness app built with MERN stack featuring real-time workout tracking, nutrition monitoring, and custom workout plans. Includes JWT authentication, Cloudinary integration, drag-and-drop workout builder, interactive analytics dashboard with Chart.js, and comprehensive nutrition database with cross-device data persistence.",
+    liveUrl: "https://grindx-workout-tracker.onrender.com",
+    repoUrl: "#",
+  },
   {
     id: "genora",
     title: "Genora.ai — AI SaaS (PERN)",
