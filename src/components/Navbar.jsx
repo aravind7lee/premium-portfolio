@@ -848,16 +848,7 @@ export default function Navbar() {
                   </ul>
                 </motion.nav>
 
-                {/* theme toggle row */}
-                <motion.div
-                  className="mt-5 flex items-center justify-between"
-                  variants={itemVariants}
-                >
-                  <div style={{ color: p.meta }}>Theme</div>
-                  <div>
-                    <ThemeToggle />
-                  </div>
-                </motion.div>
+
 
                 {/* CTA */}
                 <motion.div className="mt-6" variants={itemVariants}>

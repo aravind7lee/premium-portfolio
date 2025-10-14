@@ -19,34 +19,29 @@ function ThemeToggleImpl({ className = "" }) {
   // motion values avoid re-layout and re-render on every frame
   const x = useMotionValue(isDark ? 28 : 0);
   const xSpring = useSpring(x, {
-    stiffness: prefersReduced ? 1 : 780,
-    damping: prefersReduced ? 30 : 32,
+    stiffness: prefersReduced ? 1000 : 780,
+    damping: prefersReduced ? 50 : 32,
     mass: 0.9,
   });
   const rotate = useTransform(xSpring, [0, 28], [0, 180]);
 
-  // update target when theme changes (instant for reduced motion)
+  // update target when theme changes
   React.useEffect(() => {
-    if (prefersReduced) {
-      x.set(isDark ? 28 : 0);
-    } else {
-      x.set(isDark ? 28 : 0);
-    }
-  }, [isDark, prefersReduced, x]);
+    const targetX = isDark ? 28 : 0;
+    x.set(targetX);
+  }, [isDark, x]);
 
   // Optimistic, snappy interaction
   const isToggling = useRef(false);
   const onToggle = () => {
     if (isToggling.current) return;
     isToggling.current = true;
-    // Optimistically animate the knob first for instant feel
-    x.set(isDark ? 0 : 28);
-    // Commit theme on next frame to avoid blocking
-    requestAnimationFrame(() => {
-      cycleTheme();
-      // allow another toggle after a short moment
-      setTimeout(() => (isToggling.current = false), 120);
-    });
+    
+    // Toggle the theme immediately
+    cycleTheme();
+    
+    // Allow another toggle after animation
+    setTimeout(() => (isToggling.current = false), prefersReduced ? 50 : 200);
   };
 
   const bg = useMemo(
@@ -101,12 +96,10 @@ function ThemeToggleImpl({ className = "" }) {
           style={{ x: xSpring }}
           whileTap={prefersReduced ? undefined : { scale: 0.97 }}
           className="w-7 h-7 rounded-full shadow-sm flex items-center justify-center absolute top-1 left-1"
-          transition={
-            prefersReduced
-              ? { duration: 0 }
-              : { type: "spring", stiffness: 820, damping: 28 }
-          }
-          animate={{ backgroundColor: isDark ? "#0b1220" : "#ffffff" }}
+          animate={{ 
+            backgroundColor: isDark ? "#0b1220" : "#ffffff",
+            transition: { duration: prefersReduced ? 0 : 0.2 }
+          }}
         >
           {/* Only one icon is mounted; crossfade/scale on switch */}
           <AnimatePresence initial={false} mode="wait">
