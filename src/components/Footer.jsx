@@ -244,7 +244,7 @@ export default function Footer() {
                   },
                   {
                     icon: FaInstagram,
-                    href: "https://www.instagram.com/aravvvv._.20",
+                    href: "https://www.instagram.com/aravvvv._.22/",
                     label: "Instagram",
                   },
                 ].map(({ icon: Icon, href, label }) => (

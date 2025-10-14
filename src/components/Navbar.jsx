@@ -694,85 +694,87 @@ export default function Navbar() {
                 right: 0,
                 bottom: 0,
                 zIndex: 70,
-                width: "92%",
-                maxWidth: 420,
-                padding: 20,
-                borderRadius: 16,
-                margin: 12,
-                background: p.drawerBg,
-                border: `1px solid ${p.border}`,
+                width: "82%",
+                maxWidth: 360,
+                padding: 0,
+                borderRadius: 24,
+                margin: 20,
+                background: isDark 
+                  ? "rgba(3,7,18,0.85)" 
+                  : "rgba(255,255,255,0.85)",
+                border: isDark 
+                  ? "1px solid rgba(159,122,234,0.08)" 
+                  : "1px solid rgba(124,58,237,0.08)",
                 boxShadow: isDark
-                  ? "0 15px 60px rgba(0,0,0,0.6)"
-                  : "0 10px 40px rgba(2,6,23,0.08)",
-                overflow: "auto",
+                  ? "0 32px 120px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.02)"
+                  : "0 32px 120px rgba(2,6,23,0.2), inset 0 1px 0 rgba(255,255,255,0.8)",
+                overflow: "hidden",
                 WebkitOverflowScrolling: "touch",
-                backdropFilter: "blur(10px)",
-                WebkitBackdropFilter: "blur(10px)",
+                backdropFilter: "blur(32px) saturate(180%)",
+                WebkitBackdropFilter: "blur(32px) saturate(180%)",
                 transformOrigin: "right center",
                 willChange: "transform, opacity, filter",
               }}
             >
-              {/* Infinity rotating backdrop */}
-              <InfinityBackdrop />
-
-              {/* particle aura layer */}
-              {canParticles && (
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    zIndex: 1,
-                    pointerEvents: "none",
-                    borderRadius: 12,
-                    overflow: "hidden",
-                  }}
-                >
-                  <Particles
-                    id="drawer-particles"
-                    init={particlesInit}
-                    options={particlesOptions}
-                  />
-                </div>
-              )}
+              {/* Premium gradient mesh */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: isDark
+                    ? `radial-gradient(circle at 25% 15%, rgba(159,122,234,0.12) 0%, transparent 40%),
+                       radial-gradient(circle at 75% 85%, rgba(6,182,212,0.08) 0%, transparent 40%),
+                       linear-gradient(135deg, rgba(159,122,234,0.03) 0%, transparent 50%)`
+                    : `radial-gradient(circle at 25% 15%, rgba(124,58,237,0.08) 0%, transparent 40%),
+                       radial-gradient(circle at 75% 85%, rgba(6,182,212,0.06) 0%, transparent 40%),
+                       linear-gradient(135deg, rgba(124,58,237,0.02) 0%, transparent 50%)`,
+                  pointerEvents: "none",
+                  borderRadius: 24,
+                }}
+              />
+              
+              {/* Noise texture overlay */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  opacity: isDark ? 0.015 : 0.008,
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                  pointerEvents: "none",
+                  borderRadius: 24,
+                }}
+              />
 
               {/* content layer */}
-              <div style={{ position: "relative", zIndex: 2 }}>
+              <div style={{ position: "relative", zIndex: 2, padding: "28px 24px 24px" }}>
                 {/* header row */}
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
+                <div className="flex items-center justify-between mb-12">
+                  <div className="scale-85 opacity-90">
                     <Logo isDark={isDark} />
                   </div>
 
-                  {/* close with morph visual */}
-                  <button
-                    onClick={() => {
-                      // small spark visual (CSS)
-                      setOpen(false);
+                  <motion.button
+                    onClick={close}
+                    aria-label="Close menu"
+                    className="relative p-2.5 rounded-2xl transition-all duration-300"
+                    style={{
+                      background: isDark 
+                        ? "rgba(255,255,255,0.04)" 
+                        : "rgba(0,0,0,0.04)",
+                      border: isDark 
+                        ? "1px solid rgba(255,255,255,0.06)" 
+                        : "1px solid rgba(0,0,0,0.06)",
+                      color: isDark ? "#d1d5db" : "#6b7280",
                     }}
-                    aria-label="Close"
-                    className="p-2 rounded-md inline-flex items-center justify-center"
-                    style={{ background: "transparent", border: "none" }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
                   >
-                    <motion.div
-                      initial={{ scale: 1 }}
-                      animate={{
-                        rotate: open && !reducedMotion ? 180 : 0,
-                        scale: 1,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 420,
-                        damping: 30,
-                      }}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <FiX size={22} />
-                    </motion.div>
-                  </button>
+                    <FiX size={18} strokeWidth={2.5} />
+                  </motion.button>
                 </div>
 
                 {/* nav list */}
@@ -781,67 +783,139 @@ export default function Navbar() {
                   animate="visible"
                   variants={listVariants}
                   aria-label="Primary"
+                  className="flex-1 mb-8"
                 >
-                  <ul className="flex flex-col gap-3">
-                    {links.map((l) => {
+                  <ul className="space-y-1">
+                    {links.map((l, index) => {
                       const active = location.pathname === l.to;
                       return (
                         <motion.li
                           key={l.to}
                           variants={itemVariants}
-                          {...itemHover}
                         >
-                          <Link
-                            to={l.to}
-                            onClick={close}
-                            className="block w-full rounded-xl px-4 py-3 text-lg font-medium"
-                            style={{
-                              color: p.text,
-                              background: active
-                                ? isDark
-                                  ? "rgba(255,255,255,0.03)"
-                                  : "rgba(2,6,23,0.03)"
-                                : "transparent",
-                              boxShadow: active
-                                ? `0 14px 40px ${
-                                    isDark
-                                      ? "rgba(159,122,234,0.06)"
-                                      : "rgba(124,58,237,0.04)"
-                                  }`
-                                : "none",
-                              transform: "translateZ(0)",
-                              borderRadius: 12,
-                              border: "1px solid transparent",
+                          <motion.div
+                            whileHover={{
+                              scale: 1.02,
+                              x: 4,
+                              transition: { 
+                                type: "spring", 
+                                stiffness: 400, 
+                                damping: 25,
+                                mass: 0.8
+                              }
+                            }}
+                            whileTap={{
+                              scale: 0.98,
+                              x: 2,
+                              transition: { duration: 0.1 }
                             }}
                           >
-                            <span
+                            <Link
+                              to={l.to}
+                              onClick={close}
+                              className="group relative flex items-center px-5 py-4 rounded-3xl text-[15px] font-medium overflow-hidden"
                               style={{
-                                display: "inline-block",
-                                position: "relative",
+                                color: active 
+                                  ? (isDark ? "#ffffff" : "#0f172a")
+                                  : (isDark ? "#9ca3af" : "#64748b"),
+                                background: active
+                                  ? isDark
+                                    ? "rgba(159,122,234,0.12)"
+                                    : "rgba(124,58,237,0.06)"
+                                  : "transparent",
+                                fontWeight: active ? 600 : 500,
+                                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                              }}
+                            >
+                            {/* Active glow */}
+                            {active && (
+                              <motion.div
+                                layoutId="activeGlow"
+                                className="absolute inset-0 rounded-3xl"
+                                style={{
+                                  background: isDark
+                                    ? "linear-gradient(135deg, rgba(159,122,234,0.08), rgba(6,182,212,0.04))"
+                                    : "linear-gradient(135deg, rgba(124,58,237,0.04), rgba(6,182,212,0.02))",
+                                  boxShadow: isDark
+                                    ? "inset 0 1px 0 rgba(255,255,255,0.05)"
+                                    : "inset 0 1px 0 rgba(255,255,255,0.5)",
+                                }}
+                                transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                              />
+                            )}
+                            
+                            {/* Active indicator dot */}
+                            {active && (
+                              <motion.div
+                                layoutId="activeDot"
+                                className="absolute left-3 top-1/2 w-1.5 h-1.5 rounded-full"
+                                style={{
+                                  background: "linear-gradient(135deg, #9f7aea, #06b6d4)",
+                                  transform: "translateY(-50%)",
+                                  boxShadow: "0 0 8px rgba(159,122,234,0.4)",
+                                }}
+                                transition={{ type: "spring", stiffness: 600, damping: 30 }}
+                              />
+                            )}
+                            
+                            {/* Premium hover background */}
+                            <motion.div 
+                              className="absolute inset-0 rounded-3xl"
+                              style={{
+                                background: isDark
+                                  ? "linear-gradient(135deg, rgba(159,122,234,0.08), rgba(6,182,212,0.04))"
+                                  : "linear-gradient(135deg, rgba(124,58,237,0.04), rgba(6,182,212,0.02))",
+                                opacity: 0,
+                              }}
+                              whileHover={{
+                                opacity: 1,
+                                transition: { duration: 0.3, ease: "easeOut" }
+                              }}
+                            />
+                            
+                            {/* Smooth shimmer effect */}
+                            <motion.div 
+                              className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                              style={{ x: "-100%" }}
+                              whileHover={{
+                                x: "100%",
+                                transition: { duration: 0.8, ease: "easeInOut" }
+                              }}
+                            />
+                            
+                            {/* Subtle glow on hover */}
+                            <motion.div 
+                              className="absolute inset-0 rounded-3xl"
+                              style={{
+                                boxShadow: isDark
+                                  ? "0 0 20px rgba(159,122,234,0.15)"
+                                  : "0 0 20px rgba(124,58,237,0.1)",
+                                opacity: 0,
+                              }}
+                              whileHover={{
+                                opacity: 1,
+                                transition: { duration: 0.4, ease: "easeOut" }
+                              }}
+                            />
+                            
+                            <motion.span 
+                              className={`relative z-10 ${active ? 'ml-4' : 'ml-2'}`}
+                              whileHover={{
+                                x: 2,
+                                transition: { 
+                                  type: "spring", 
+                                  stiffness: 300, 
+                                  damping: 20 
+                                }
+                              }}
+                              style={{
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                               }}
                             >
                               {l.label}
-                              <span
-                                style={{
-                                  display: active ? "inline-block" : "none",
-                                  position: "absolute",
-                                  left: -14,
-                                  top: "50%",
-                                  transform: "translateY(-50%)",
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: 999,
-                                  background:
-                                    "linear-gradient(90deg,#9f7aea,#06b6d4)",
-                                  boxShadow: `0 6px 18px ${
-                                    isDark
-                                      ? "rgba(159,122,234,0.12)"
-                                      : "rgba(6,182,212,0.08)"
-                                  }`,
-                                }}
-                              />
-                            </span>
-                          </Link>
+                            </motion.span>
+                            </Link>
+                          </motion.div>
                         </motion.li>
                       );
                     })}
@@ -851,24 +925,44 @@ export default function Navbar() {
 
 
                 {/* CTA */}
-                <motion.div className="mt-6" variants={itemVariants}>
+                <motion.div 
+                  className="pt-8 border-t" 
+                  variants={itemVariants}
+                  style={{
+                    borderColor: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"
+                  }}
+                >
                   <motion.a
-                    {...ctaHover}
                     href="/Aravind R-Updated-Resume.pdf"
                     download
                     onClick={close}
-                    className="w-full inline-flex items-center justify-center px-4 py-3 rounded-full font-bold"
+                    className="group relative w-full flex items-center justify-center px-8 py-5 rounded-3xl font-semibold text-white overflow-hidden min-h-[56px]"
                     style={{
-                      background: p.accent,
-                      color: isDark ? "#060814" : "#010214",
+                      background: "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 50%, #10b981 100%)",
+                      backgroundSize: "200% 200%",
+                      fontSize: "16px",
                       boxShadow: isDark
-                        ? "0 12px 40px rgba(159,122,234,0.12)"
-                        : "0 10px 32px rgba(6,182,212,0.12)",
-                      borderRadius: 999,
-                      transform: "translateZ(0)",
+                        ? "0 12px 40px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.1)"
+                        : "0 12px 40px rgba(139,92,246,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
                     }}
+                    whileHover={{ 
+                      scale: 1.02, 
+                      y: -3,
+                      backgroundPosition: "100% 0%",
+                      boxShadow: isDark
+                        ? "0 16px 50px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.15)"
+                        : "0 16px 50px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.3)"
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   >
-                    Download Resume
+                    {/* Animated shimmer */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                    
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-400/20 to-teal-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
+                    
+                    <span className="relative z-10 tracking-wide font-medium">Download Resume</span>
                   </motion.a>
                 </motion.div>
               </div>

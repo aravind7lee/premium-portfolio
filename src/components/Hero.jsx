@@ -244,12 +244,39 @@ export default function Hero() {
             </div>
 
             <div className="mt-6">
-              <a
-                href="#projects"
-                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white"
+              <button
+                onClick={() => {
+                  const projectsSection = document.getElementById('projects');
+                  if (projectsSection) {
+                    const targetPosition = projectsSection.offsetTop - 80;
+                    const startPosition = window.pageYOffset;
+                    const distance = targetPosition - startPosition;
+                    const duration = 800;
+                    let start = null;
+
+                    function animation(currentTime) {
+                      if (start === null) start = currentTime;
+                      const timeElapsed = currentTime - start;
+                      const run = easeInOutCubic(timeElapsed, startPosition, distance, duration);
+                      window.scrollTo(0, run);
+                      if (timeElapsed < duration) requestAnimationFrame(animation);
+                    }
+
+                    function easeInOutCubic(t, b, c, d) {
+                      t /= d / 2;
+                      if (t < 1) return c / 2 * t * t * t + b;
+                      t -= 2;
+                      return c / 2 * (t * t * t + 2) + b;
+                    }
+
+                    requestAnimationFrame(animation);
+                  }
+                }}
+                className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors duration-300"
+                aria-label="Scroll to projects section"
               >
                 <span className="animate-bounce">↓</span> Scroll to projects
-              </a>
+              </button>
             </div>
           </Motion.div>
 
