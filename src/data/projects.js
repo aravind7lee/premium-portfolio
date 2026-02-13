@@ -7,8 +7,21 @@ import work4 from "../assets/work-4.png";
 import work5 from "../assets/work-5.png";
 import work6 from "../assets/work-6.jpg";
 import work7 from "../assets/work-7.png";
+import work8 from "../assets/work-8.png";
 
 const projects = [
+  {
+    id: "resuflow",
+    title: "ResuFlow — AI-Powered Resume Builder",
+    summary:
+      "AI-powered resume builder with live preview, shareable links, and smart optimization using Google Gemini AI.",
+    tags: ["MERN", "AI", "Google Gemini", "ImageKit", "REST API", "Responsive"],
+    image: work8,
+    details:
+      "ResuFlow enables users to create, edit, and manage professional resumes with live preview, shareable online links, and AI-based optimization powered by Google Gemini AI. Features smart suggestions, keyword enhancement, image background removal using ImageKit, secure authentication, and 12+ professional templates. Delivers a smooth, fast, and intuitive user experience across all devices.",
+    liveUrl: "https://resuflow-app.vercel.app/",
+    repoUrl: "#",
+  },
   {
     id: "grindx",
     title: "GRIND-x — Full-Stack Fitness App (MERN)",
