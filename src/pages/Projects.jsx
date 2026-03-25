@@ -9,7 +9,7 @@ import React, {
 import { motion } from "framer-motion";
 import projects from "../data/projects";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
-import ProjectCard from "../components/ProjectCard";
+import ProjectCard from "../components/EnhancedProjectCard";
 import { SkeletonProjectCard, useSkeletonAsync } from "../components/skeleton";
 
 /**
@@ -358,7 +358,7 @@ export default function Projects() {
                 duration={500}
                 className="h-full"
               >
-                <ProjectCard project={p} onOpen={open} />
+                <ProjectCard project={{ ...p, featured: index < 2 }} onOpen={open} />
               </ScrollReveal>
             ))}
           </div>

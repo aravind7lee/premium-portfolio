@@ -4,7 +4,7 @@ import { motion as Motion } from "framer-motion";
 import Hero from "../components/Hero";
 import CtaBanner from "../components/CtaBanner";
 import projects from "../data/projects";
-import ProjectCard from "../components/ProjectCard";
+import ProjectCard from "../components/EnhancedProjectCard";
 import { useNavigate } from "react-router-dom";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import ParticleBackground from "../components/ParticleBackground"; // should accept `paused` prop
@@ -356,9 +356,9 @@ export default function Home() {
               animate={animState(projectsVisible)}
               className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
-              {(projectsData || projects.slice(0, 3)).map((p) => (
+              {(projectsData || projects.slice(0, 3)).map((p, index) => (
                 <Motion.div key={p.id} variants={reduce ? {} : variants.fadeUp} style={{ willChange: "transform, opacity" }}>
-                  <ProjectCard project={p} onOpen={openProjects} />
+                  <ProjectCard project={{ ...p, featured: index === 0 }} onOpen={openProjects} />
                 </Motion.div>
               ))}
             </Motion.div>

@@ -182,27 +182,75 @@ export default function Hero() {
             animate={reduce ? "visible" : contentVisible ? "visible" : "hidden"}
             className="order-2 md:order-1 space-y-6 z-10 text-center md:text-left"
           >
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
+            {/* Animated badge */}
+            <Motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600/20 to-teal-400/20 border border-purple-500/30 backdrop-blur-sm"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+              </span>
+              <span className="text-sm font-medium text-white/90">Available for opportunities</span>
+            </Motion.div>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight">
               I build{" "}
-              <span className="bg-gradient-to-r from-purple-400 to-teal-300 bg-clip-text text-transparent">
-                premium
+              <span className="relative inline-block">
+                <span className="text-gradient-animate">
+                  premium
+                </span>
+                <Motion.span
+                  className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-teal-400 rounded-full"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
+                />
               </span>{" "}
               interactive web experiences.
             </h1>
 
-            <p className="text-lg text-white/80 max-w-xl mx-auto md:mx-0">
+            <p className="text-base md:text-lg text-white/80 max-w-xl mx-auto md:mx-0 leading-relaxed">
               {heroData?.content?.description ||
                 "Crafting modern digital experiences with React, Node.js, and TailwindCSS. Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions"}
             </p>
 
+            {/* Stats row */}
+            <Motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="flex flex-wrap gap-6 justify-center md:justify-start pt-2"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
+                  <span className="text-lg font-bold text-purple-400">8+</span>
+                </div>
+                <div className="text-left">
+                  <div className="text-xs text-white/60">Projects</div>
+                  <div className="text-sm font-semibold text-white/90">Completed</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400/20 to-teal-400/10 border border-teal-400/30 flex items-center justify-center">
+                  <span className="text-lg font-bold text-teal-400">9.73</span>
+                </div>
+                <div className="text-left">
+                  <div className="text-xs text-white/60">CGPA</div>
+                  <div className="text-sm font-semibold text-white/90">MCA</div>
+                </div>
+              </div>
+            </Motion.div>
+
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center md:justify-start">
               {/* Resume Download Button */}
-              <button
+              <Motion.button
                 onClick={() => {
                   setIsDownloading(true);
                   setTimeout(() => {
                     setIsDownloading(false);
-                    // Trigger download after animation completes
                     const a = document.createElement('a');
                     a.href = '/Aravind R-Updated-Resume.pdf';
                     a.download = 'Aravind R-Updated-Resume.pdf';
@@ -212,35 +260,49 @@ export default function Hero() {
                   }, 2000);
                 }}
                 disabled={isDownloading}
-                className="relative group w-full sm:w-auto px-4 sm:px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/25 active:scale-95 sm:hover:scale-105 hover:from-purple-500 hover:to-teal-300 overflow-hidden touch-manipulation disabled:opacity-80"
+                className="relative group w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 active:scale-95 sm:hover:scale-105 overflow-hidden touch-manipulation disabled:opacity-80 btn-magnetic"
                 aria-label="Download resume"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <span className="relative z-10 flex items-center justify-center min-h-[24px]">
+                <span className="relative z-10 flex items-center justify-center min-h-[24px] gap-2">
                   {isDownloading ? (
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-16 sm:w-20 md:w-24 h-2 sm:h-3 rounded bg-white/40 animate-pulse" />
+                    <>
+                      <Motion.div
+                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      />
                       <span className="text-sm sm:text-base">Preparing...</span>
-                    </div>
+                    </>
                   ) : (
-                    <span className="text-sm sm:text-base">Download Resume</span>
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span className="text-sm sm:text-base">Download Resume</span>
+                    </>
                   )}
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </button>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              </Motion.button>
 
               {/* Mail Me Button */}
-              <a
+              <Motion.a
                 href={mailtoHref}
                 onClick={handleMailClick}
-                className="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl glass border border-white/20 transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 active:scale-95 sm:hover:scale-105 overflow-hidden touch-manipulation"
+                className="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl glass-modern border border-white/20 transition-all duration-300 hover:border-purple-500/50 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 active:scale-95 sm:hover:scale-105 overflow-hidden touch-manipulation"
                 aria-label="Send me an email"
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <FiMail className="text-base sm:text-lg transition-transform duration-300 group-hover:rotate-12" /> 
-                  <span className="text-sm sm:text-base">Mail Me</span>
+                  <span className="text-sm sm:text-base font-medium">Mail Me</span>
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </a>
+              </Motion.a>
             </div>
 
             <div className="mt-6">

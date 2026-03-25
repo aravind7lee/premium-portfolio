@@ -10,9 +10,10 @@ import { motion } from "framer-motion";
 import {
   FaGithub,
   FaLinkedin,
-  FaExternalLinkAlt,
+  FaInstagram,
   FaEnvelope,
   FaPhone,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import ParticleBackground from "../components/ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
@@ -191,22 +192,22 @@ export default function About() {
     },
     projects: [
       {
-        name: "Cravezy - Food Delivery Website",
-        url: "https://foodcra-frontend.onrender.com/",
+        name: "ResuFlow - AI Resume Builder",
+        url: "https://resuflow-app.vercel.app/",
         details:
-          "Food delivery web app with JWT auth, Stripe payments and real-time order management (MongoDB). Features: meal planner, sticky cart, dark mode and nutrition filters.",
+          "AI-powered resume builder with Google Gemini AI, live preview, 12+ ATS-friendly templates, shareable links, and ImageKit integration. Built with MERN stack.",
+      },
+      {
+        name: "GRIND-x - Full-Stack Fitness App",
+        url: "https://grindx-workout-tracker.onrender.com",
+        details:
+          "Comprehensive fitness tracking with real-time workout tracking, nutrition monitoring, custom workout plans, JWT auth, and Cloudinary integration. MERN stack.",
       },
       {
         name: "Genora - AI SaaS Application",
         url: "https://genora-ai-phi.vercel.app/",
         details:
           "PERN Stack SaaS product with Clerk auth, Stripe subscription billing and AI-powered tools (article generator, resume analyzer, image tools).",
-      },
-      {
-        name: "Chattrix - MERN Chat Application",
-        url: "https://chattrix-app.vercel.app/",
-        details:
-          "Real-time chat using Socket.IO, React, Node, and MongoDB. Responsive UI, deployed on Vercel.",
       },
     ],
     education: [
@@ -284,32 +285,37 @@ export default function About() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Profile / Contact */}
               <aside className="order-1 md:order-1">
-                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                <div className="glass-modern rounded-2xl border border-white/10 p-6 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
                   <Reveal stagger={120} duration={600} reduceMotion={reduce}>
-                    <img
-                      src={Profile1}
-                      alt={`${person.name} profile`}
-                      className="w-40 h-40 md:w-48 md:h-48 object-cover rounded-2xl shadow-lg mx-auto"
-                    />
-                    <div className="mt-4 text-center">
-                      <h2 className="text-xl font-bold">{person.name}</h2>
-                      <div className="text-sm text-white/70 mt-1">
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-teal-400 rounded-2xl opacity-20 blur-lg"></div>
+                      <img
+                        src={Profile1}
+                        alt={`${person.name} profile`}
+                        className="relative w-40 h-40 md:w-48 md:h-48 object-cover rounded-2xl shadow-2xl mx-auto ring-2 ring-white/10"
+                      />
+                    </div>
+                    <div className="mt-6 text-center">
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent">{person.name}</h2>
+                      <div className="text-sm text-white/70 mt-2 font-medium">
                         {person.title}
                       </div>
 
-                      <div className="mt-4 flex flex-col gap-2 w-full">
+                      <div className="mt-6 flex flex-col gap-3 w-full">
                         <a
                           href={`mailto:${person.email}`}
-                          className="inline-flex items-center gap-2 justify-center px-4 py-2 rounded-md glass"
+                          className="inline-flex items-center gap-2 justify-center px-4 py-3 rounded-xl glass-modern hover:bg-white/10 transition-all duration-300 group"
                         >
-                          <FaEnvelope /> {person.email}
+                          <FaEnvelope className="group-hover:scale-110 transition-transform" /> 
+                          <span className="text-sm">{person.email}</span>
                         </a>
 
                         <a
                           href={`tel:${person.phone}`}
-                          className="inline-flex items-center gap-2 justify-center px-4 py-2 rounded-md glass"
+                          className="inline-flex items-center gap-2 justify-center px-4 py-3 rounded-xl glass-modern hover:bg-white/10 transition-all duration-300 group"
                         >
-                          <FaPhone /> {person.phone}
+                          <FaPhone className="group-hover:scale-110 transition-transform" /> 
+                          <span className="text-sm">{person.phone}</span>
                         </a>
 
                         <div className="flex items-center justify-center gap-3 mt-2">
@@ -318,35 +324,38 @@ export default function About() {
                             href={person.github}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 rounded-md glass"
+                            className="p-3 rounded-xl glass-modern hover:bg-white/10 hover:scale-110 transition-all duration-300"
                           >
-                            <FaGithub />
+                            <FaGithub className="w-5 h-5" />
                           </a>
                           <a
                             aria-label="LinkedIn"
                             href={person.linkedin}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 rounded-md glass"
+                            className="p-3 rounded-xl glass-modern hover:bg-white/10 hover:scale-110 transition-all duration-300"
                           >
-                            <FaLinkedin />
+                            <FaLinkedin className="w-5 h-5" />
                           </a>
                           <a
-                            aria-label="Portfolio"
-                            href={person.portfolio}
+                            aria-label="Instagram"
+                            href="https://www.instagram.com/aravvvv._.22/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 rounded-md glass"
+                            className="p-3 rounded-xl glass-modern hover:bg-white/10 hover:scale-110 transition-all duration-300"
                           >
-                            <FaExternalLinkAlt />
+                            <FaInstagram className="w-5 h-5" />
                           </a>
                         </div>
 
                         <a
                           href="/Aravind R-Updated-Resume.pdf"
                           download
-                          className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-purple-600 to-teal-400 text-black font-semibold"
+                          className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 hover:scale-105"
                         >
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
                           Download Resume
                         </a>
                       </div>
@@ -358,9 +367,16 @@ export default function About() {
               {/* Main content */}
               <section className="order-2 md:order-2 md:col-span-2 space-y-6">
                 {/* Summary */}
-                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                <div className="glass-modern rounded-2xl border border-white/10 p-6 shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
                   <Reveal duration={700} reduceMotion={reduce}>
-                    <h3 className="text-lg font-semibold mb-2">Summary</h3>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent">Summary</h3>
+                    </div>
                     <p className="text-white/80 leading-relaxed">
                       {person.summary}
                     </p>
@@ -368,9 +384,16 @@ export default function About() {
                 </div>
 
                 {/* Skills */}
-                <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
+                <div className="glass-modern rounded-2xl border border-white/10 p-6 shadow-lg hover:shadow-teal-500/20 transition-all duration-300">
                   <Reveal stagger={60} duration={600} reduceMotion={reduce}>
-                    <h3 className="text-lg font-semibold mb-3">Skills</h3>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400/20 to-teal-400/10 border border-teal-400/30 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">Skills</h3>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
                         <div className="text-xs text-white/60 mb-2">
@@ -441,30 +464,42 @@ export default function About() {
                 {/* Projects */}
                 <div className="glass rounded-xl border border-white/10 p-6 shadow-lg">
                   <Reveal stagger={80} reduceMotion={reduce}>
-                    <h3 className="text-lg font-semibold mb-3">
-                      Selected projects
+                    <h3 className="text-2xl font-bold mb-4 text-white">
+                      Featured Projects
                     </h3>
-                    <div className="space-y-4">
-                      {person.projects.map((p) => (
+                    <p className="text-white/70 text-sm mb-6">
+                      My best work - AI-powered solutions and full-stack applications
+                    </p>
+                    <div className="space-y-5">
+                      {person.projects.map((p, idx) => (
                         <div
                           key={p.name}
-                          className="md:flex md:justify-between md:items-start"
+                          className="p-5 rounded-xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 hover:border-emerald-500/30 transition-all duration-300 group"
                         >
-                          <div>
+                          <div className="flex items-start justify-between gap-3 mb-2">
                             <a
                               href={p.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm font-medium inline-flex items-center gap-2 hover:underline"
+                              className="text-base font-bold text-white inline-flex items-center gap-2 hover:text-emerald-400 transition-colors group-hover:translate-x-1 duration-300"
                             >
-                              {p.name} <FaExternalLinkAlt className="text-xs" />
+                              {p.name} 
+                              <FaExternalLinkAlt className="text-xs text-emerald-400" />
                             </a>
-                            <p className="text-xs text-white/70 mt-1">
-                              {p.details}
-                            </p>
                           </div>
+                          <p className="text-sm text-white/70 leading-relaxed">
+                            {p.details}
+                          </p>
                         </div>
                       ))}
+                    </div>
+                    <div className="mt-6 text-center">
+                      <a
+                        href="/projects"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg glass hover:bg-white/10 text-white font-medium transition-all hover:scale-105"
+                      >
+                        View All Projects →
+                      </a>
                     </div>
                   </Reveal>
                 </div>

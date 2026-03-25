@@ -95,39 +95,50 @@ const SkillsGrid = ({ frontendSkills, backendSkills }) => {
         variants={revealVariants}
         initial="hidden"
         animate={prefersReducedMotion ? "visible" : frontendVisible ? "visible" : "hidden"}
-        className="rounded-2xl p-8 transition-all duration-300 border bg-white/80 supports-[backdrop-filter]:bg-white/70 border-gray-200/70 shadow-lg relative overflow-hidden dark:bg-gray-900/70 dark:border-gray-700/50 group card-backdrop card-shadow skill-card"
+        className="rounded-3xl p-8 transition-all duration-300 border bg-white/80 supports-[backdrop-filter]:bg-white/70 border-gray-200/70 shadow-2xl relative overflow-hidden dark:bg-gray-900/70 dark:border-gray-700/50 group card-backdrop card-shadow skill-card hover:shadow-purple-500/30"
         role="status"
         aria-busy={!frontendVisible}
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-teal-400"></div>
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 via-pink-500 to-teal-400 rounded-t-3xl"></div>
         
-        <h2 className="text-2xl font-bold text-purple-700 dark:text-purple-300 text-center mb-8 relative">
-          <span className="relative z-10">Frontend Development</span>
-          <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full opacity-70 group-hover:w-32 transition-all duration-500"></span>
-        </h2>
-
-        <Motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={prefersReducedMotion ? "visible" : frontendVisible ? "visible" : "hidden"}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        >
-          {frontendSkills.length ? (
-            frontendSkills.map((skill, index) => (
-              <Motion.div
-                key={skill.name ?? `frontend-${index}`}
-                variants={staggerItem}
-                className="p-2"
-              >
-                <SkillItem skill={skill} index={index} />
-              </Motion.div>
-            ))
-          ) : (
-            <div className="p-4 text-sm text-gray-600 dark:text-gray-300">
-              No frontend skills found.
+        {/* Decorative gradient orb */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
+        
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
+              <svg className="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
             </div>
-          )}
-        </Motion.div>
+            <h2 className="text-2xl font-bold text-purple-700 dark:text-purple-300 relative">
+              <span className="relative z-10">Frontend Development</span>
+            </h2>
+          </div>
+
+          <Motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate={prefersReducedMotion ? "visible" : frontendVisible ? "visible" : "hidden"}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            {frontendSkills.length ? (
+              frontendSkills.map((skill, index) => (
+                <Motion.div
+                  key={skill.name ?? `frontend-${index}`}
+                  variants={staggerItem}
+                  className="p-2"
+                >
+                  <SkillItem skill={skill} index={index} />
+                </Motion.div>
+              ))
+            ) : (
+              <div className="p-4 text-sm text-gray-600 dark:text-gray-300">
+                No frontend skills found.
+              </div>
+            )}
+          </Motion.div>
+        </div>
       </Motion.div>
 
       {/* Backend Development */}
@@ -136,39 +147,50 @@ const SkillsGrid = ({ frontendSkills, backendSkills }) => {
         variants={revealVariants}
         initial="hidden"
         animate={prefersReducedMotion ? "visible" : backendVisible ? "visible" : "hidden"}
-        className="rounded-2xl p-8 transition-all duration-300 border bg-white/80 supports-[backdrop-filter]:bg-white/70 border-gray-200/70 shadow-lg relative overflow-hidden dark:bg-gray-900/70 dark:border-gray-700/50 group card-backdrop card-shadow skill-card"
+        className="rounded-3xl p-8 transition-all duration-300 border bg-white/80 supports-[backdrop-filter]:bg-white/70 border-gray-200/70 shadow-2xl relative overflow-hidden dark:bg-gray-900/70 dark:border-gray-700/50 group card-backdrop card-shadow skill-card hover:shadow-teal-500/30"
         role="status"
         aria-busy={!backendVisible}
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-purple-400"></div>
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-500 via-cyan-500 to-purple-400 rounded-t-3xl"></div>
         
-        <h2 className="text-2xl font-bold text-teal-700 dark:text-teal-300 text-center mb-8 relative">
-          <span className="relative z-10">Backend Development</span>
-          <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-teal-400 to-teal-600 rounded-full opacity-70 group-hover:w-32 transition-all duration-500"></span>
-        </h2>
-
-        <Motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={prefersReducedMotion ? "visible" : backendVisible ? "visible" : "hidden"}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        >
-          {backendSkills.length ? (
-            backendSkills.map((skill, index) => (
-              <Motion.div
-                key={skill.name ?? `backend-${index}`}
-                variants={staggerItem}
-                className="p-2"
-              >
-                <SkillItem skill={skill} index={index} />
-              </Motion.div>
-            ))
-          ) : (
-            <div className="p-4 text-sm text-gray-600 dark:text-gray-300">
-              No backend skills found.
+        {/* Decorative gradient orb */}
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-gradient-to-br from-teal-500/20 to-cyan-500/20 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
+        
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400/20 to-teal-400/10 border border-teal-400/30 flex items-center justify-center">
+              <svg className="w-6 h-6 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+              </svg>
             </div>
-          )}
-        </Motion.div>
+            <h2 className="text-2xl font-bold text-teal-700 dark:text-teal-300 relative">
+              <span className="relative z-10">Backend Development</span>
+            </h2>
+          </div>
+
+          <Motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate={prefersReducedMotion ? "visible" : backendVisible ? "visible" : "hidden"}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            {backendSkills.length ? (
+              backendSkills.map((skill, index) => (
+                <Motion.div
+                  key={skill.name ?? `backend-${index}`}
+                  variants={staggerItem}
+                  className="p-2"
+                >
+                  <SkillItem skill={skill} index={index} />
+                </Motion.div>
+              ))
+            ) : (
+              <div className="p-4 text-sm text-gray-600 dark:text-gray-300">
+                No backend skills found.
+              </div>
+            )}
+          </Motion.div>
+        </div>
       </Motion.div>
     </div>
   );

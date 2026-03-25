@@ -425,16 +425,25 @@ export default function Contact() {
               {/* Header */}
               <header className="mb-8">
                 <Reveal variant="zoom-in" delay={0.06} duration={0.36}>
-                  <h1
-                    id="contact-heading"
-                    className="text-3xl md:text-4xl font-extrabold"
-                  >
-                    Contact
-                  </h1>
-                  <p className="mt-2 text-sm text-white/80 max-w-xl">
-                    Have a question, collaboration idea, or want to say hi? Drop
-                    a message.
-                  </p>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h1
+                        id="contact-heading"
+                        className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent"
+                      >
+                        Contact
+                      </h1>
+                      <p className="mt-1 text-sm text-white/80 max-w-xl">
+                        Have a question, collaboration idea, or want to say hi? Drop
+                        a message.
+                      </p>
+                    </div>
+                  </div>
                 </Reveal>
               </header>
 
@@ -451,10 +460,17 @@ export default function Contact() {
                 {/* Right: Details */}
                 <Reveal variant="slide-left" delay={0.16}>
                   <aside className="space-y-6 w-full">
-                    <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
-                      <h2 className="text-lg font-semibold mb-3">
-                        Contact details
-                      </h2>
+                    <div className="glass-modern rounded-2xl p-6 w-full backdrop-heavy shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 border border-white/10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400/20 to-teal-400/10 border border-teal-400/30 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <h2 className="text-lg font-semibold bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">
+                          Contact details
+                        </h2>
+                      </div>
                       <div className="space-y-3 text-sm">
                         <div className="flex items-start gap-3">
                           <span className="p-2 rounded-md bg-white/6 flex items-center justify-center pointer-events-none">
@@ -500,8 +516,15 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
-                      <h3 className="font-semibold">Availability</h3>
+                    <div className="glass-modern rounded-2xl p-6 w-full backdrop-heavy shadow-2xl hover:shadow-teal-500/20 transition-all duration-300 border border-white/10">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <h3 className="font-semibold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent">Availability</h3>
+                      </div>
                       <p className="mt-2 text-sm text-white/80">
                         Open to full-time and contract opportunities. Available
                         for projects, mentorship, and collaborations, especially
@@ -509,8 +532,15 @@ export default function Contact() {
                       </p>
                     </div>
 
-                    <div className="glass rounded-lg p-6 w-full backdrop-heavy shadow-heavy">
-                      <h3 className="font-semibold">Quick links</h3>
+                    <div className="glass-modern rounded-2xl p-6 w-full backdrop-heavy shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 border border-white/10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500/20 to-pink-500/10 border border-pink-500/30 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                        </div>
+                        <h3 className="font-semibold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Quick links</h3>
+                      </div>
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         <a
                           className="inline-flex items-center gap-2 px-3 py-2 rounded-md glass text-sm"
