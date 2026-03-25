@@ -67,7 +67,7 @@ const projects = [
     image: work2,
     details:
       "Food delivery app built on the MERN stack — features meal planning, sticky cart and nutrition based filtering. Focused on mobile-first experiences and smooth ordering flows. Deployed with Render.",
-    liveUrl: "https://cravezyy-foodcra-frontend.onrender.com",
+    liveUrl: "https://foodcra-frontend.onrender.com/",
     repoUrl: "#",
   },
   {
