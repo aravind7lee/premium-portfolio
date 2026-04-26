@@ -1,4 +1,4 @@
-# Portfolio Deployment Guide
+<!-- # Portfolio Deployment Guide
 
 ## 404 Error Fix for Netlify and Vercel
 
@@ -48,9 +48,15 @@ Updated to include proper SPA handling with `historyApiFallback: true`.
 After deployment:
 1. Navigate to any route (e.g., `/about`, `/projects`)
 2. Refresh the page
-3. The page should load correctly without 404 errors
+
+
+1. The page should load correctly without 404 errors
 
 ### Additional Notes
 - The `_redirects` file must be in the `public` folder to be included in the build
 - The `vercel.json` file should be in the root directory
-- Both configurations ensure that all routes are handled by your React application
+- Both configurations ensure that all routes are handled by your React application -->
+  
+
+
+
