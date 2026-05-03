@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="light" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Arav Portfolio</title>
+
+    <!--
+      Pre-boot theme snippet:
+      - Runs immediately (before CSS/React) to avoid flicker.
+      - Reads localStorage 'theme' (allowed: 'dark' | 'light') and applies it.
+      - Defaults to 'light' if nothing valid is stored.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var theme =
+            stored === "dark" || stored === "light" ? stored : "light";
+          var html = document.documentElement;
+          // set data-theme (used by your CSS custom properties)
+          html.setAttribute("data-theme", theme);
+          // toggle Tailwind 'dark' class for dark: utilities
+          if (theme === "dark") html.classList.add("dark");
+          else html.classList.remove("dark");
+        } catch (e) {
+          // Fail silently — default 'data-theme="light"' on <html> will be used.
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-BuQlIcDU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BU6sVgHa.css">
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+  </body>
+</html>

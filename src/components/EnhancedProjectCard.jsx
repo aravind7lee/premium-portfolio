@@ -1,129 +1,134 @@
 // src/components/EnhancedProjectCard.jsx
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { FiExternalLink, FiGithub, FiCode, FiStar } from "react-icons/fi";
+import React, { useRef, useCallback, memo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiExternalLink, FiGithub, FiCode, FiStar, FiCheckSquare, FiSquare } from "react-icons/fi";
 
-export default function EnhancedProjectCard({ project, onOpen }) {
-  const [isHovered, setIsHovered] = useState(false);
+const EnhancedProjectCard = memo(function EnhancedProjectCard({
+  project, onOpen, compareMode, isCompared, onToggleCompare,
+}) {
+  const cardRef = useRef(null);
+  const rafRef = useRef(null);
+
+  // Pure CSS tilt — zero React state, zero re-renders on mousemove
+  const handleMouseMove = useCallback((e) => {
+    if (rafRef.current) return; // skip if frame already queued
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const el = cardRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `perspective(900px) rotateX(${-y * 8}deg) rotateY(${x * 8}deg) scale(1.02)`;
+    });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    const el = cardRef.current;
+    if (el) el.style.transform = "";
+  }, []);
+
+  const previewSrc = project.previewGif || project.previewVideo || null;
+  const isVideo = previewSrc && (previewSrc.endsWith(".mp4") || previewSrc.endsWith(".webm"));
 
   return (
-    <motion.div
-      className="group relative h-full cursor-pointer"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={() => onOpen(project)}
-      whileHover={{ y: -8 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+    <div
+      ref={cardRef}
+      className="pcard"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={() => !compareMode && onOpen(project)}
+      onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !compareMode) { e.preventDefault(); onOpen(project); } }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Open ${project.title}`}
     >
-      {/* Subtle glow effect - much softer */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-2xl opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
-      
-      <div className="relative h-full bg-white/5 dark:bg-white/5 rounded-2xl overflow-hidden border border-white/10 group-hover:border-white/20 transition-all duration-300 backdrop-blur-sm">
-        {/* Image container */}
-        <div className="relative h-48 overflow-hidden">
-          <motion.img
-            src={project.image}
-            alt={project.title}
-            className="w-full h-full object-cover"
-            animate={{
-              scale: isHovered ? 1.05 : 1,
-            }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          />
-          
-          {/* Subtle overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
-          
-          {/* Featured badge - cleaner design */}
-          {project.featured && (
-            <div className="absolute top-3 right-3 px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg">
-              <FiStar className="w-3 h-3 text-yellow-400" />
-              Featured
-            </div>
-          )}
-          
-          {/* Quick action buttons - cleaner style */}
-          <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            {project.liveUrl && (
-              <motion.a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-lg bg-black/40 backdrop-blur-md border border-white/20 hover:bg-black/60 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <FiExternalLink className="w-4 h-4 text-white" />
-              </motion.a>
-            )}
-            {project.repoUrl && project.repoUrl !== "#" && (
-              <motion.a
-                href={project.repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-lg bg-black/40 backdrop-blur-md border border-white/20 hover:bg-black/60 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <FiGithub className="w-4 h-4 text-white" />
-              </motion.a>
-            )}
+      {/* Image area */}
+      <div className="pcard-img">
+        <img src={project.image} alt={project.title} className="pcard-thumb" loading="lazy" decoding="async" />
+
+        {/* Preview overlay — only rendered when src exists, shown via CSS opacity */}
+        {previewSrc && (
+          <div className="pcard-preview">
+            {isVideo
+              ? <video src={previewSrc} autoPlay muted loop playsInline className="pcard-thumb" />
+              : <img src={previewSrc} alt="preview" className="pcard-thumb" />
+            }
           </div>
-        </div>
+        )}
 
-        {/* Content */}
-        <div className="p-5 space-y-3">
-          {/* Title */}
-          <h3 className="text-lg font-bold text-white group-hover:text-white/90 transition-colors duration-300">
-            {project.title}
-          </h3>
+        <div className="pcard-gradient" />
 
-          {/* Description */}
-          <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">
-            {project.summary || project.details}
-          </p>
+        {project.featured && (
+          <div className="pcard-badge">
+            <FiStar style={{ width: 10, height: 10 }} /> Featured
+          </div>
+        )}
 
-          {/* Tags */}
-          {project.tags && project.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              {project.tags.slice(0, 3).map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-white/10 text-white/80 border border-white/10 hover:border-white/20 hover:bg-white/15 transition-all duration-200"
-                >
-                  {tag}
-                </span>
-              ))}
-              {project.tags.length > 3 && (
-                <span className="px-2.5 py-1 text-xs rounded-lg bg-white/5 text-white/60 border border-white/10">
-                  +{project.tags.length - 3}
-                </span>
-              )}
-            </div>
+        {/* Hover actions — pure CSS opacity */}
+        <div className="pcard-actions">
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pcard-action-btn pcard-action-live"
+              onClick={(e) => e.stopPropagation()}
+              title="Live Demo"
+            >
+              <FiExternalLink style={{ width: 13, height: 13 }} />
+            </a>
           )}
-
-          {/* View Details Button - cleaner design */}
-          <motion.button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen(project);
-            }}
-            className="w-full mt-4 px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white font-medium hover:bg-white/15 hover:border-white/30 transition-all duration-300 flex items-center justify-center gap-2 group/btn"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FiCode className="w-4 h-4 group-hover/btn:rotate-12 transition-transform duration-300" />
-            View Details
-          </motion.button>
-        </div>
-
-        {/* Subtle shimmer effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          {project.repoUrl && project.repoUrl !== "#" && (
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pcard-action-btn pcard-action-repo"
+              onClick={(e) => e.stopPropagation()}
+              title="GitHub"
+            >
+              <FiGithub style={{ width: 13, height: 13 }} />
+            </a>
+          )}
         </div>
       </div>
-    </motion.div>
+
+      {/* Content */}
+      <div className="pcard-body">
+        <h3 className="pcard-title">{project.title}</h3>
+        <p className="pcard-summary">{project.summary}</p>
+
+        <div className="pcard-tags">
+          {(project.tags || []).slice(0, 3).map((tag) => (
+            <span key={tag} className="pcard-tag">{tag}</span>
+          ))}
+          {(project.tags || []).length > 3 && (
+            <span className="pcard-tag-more">+{project.tags.length - 3}</span>
+          )}
+        </div>
+
+        {compareMode ? (
+          <button
+            className={`pcard-btn ${isCompared ? "pcard-btn--selected" : ""}`}
+            onClick={(e) => { e.stopPropagation(); onToggleCompare(project); }}
+          >
+            {isCompared ? <FiCheckSquare style={{ width: 14, height: 14 }} /> : <FiSquare style={{ width: 14, height: 14 }} />}
+            {isCompared ? "Selected" : "Select to Compare"}
+          </button>
+        ) : (
+          <button
+            className="pcard-btn"
+            onClick={(e) => { e.stopPropagation(); onOpen(project); }}
+          >
+            <FiCode style={{ width: 13, height: 13 }} />
+            View Details
+          </button>
+        )}
+      </div>
+    </div>
   );
-}
+});
+
+export default EnhancedProjectCard;

@@ -19,6 +19,7 @@ import ParticleBackground from "../components/ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import Profile1 from "../assets/Profile1.jpg";
 import { SkeletonArticle, useSkeletonAsync } from "../components/skeleton";
+import { GradientTextWave, WordReveal } from "../components/TypographyAnimations";
 
 /* ---------- Utility: combine class names ---------- */
 const cx = (...args) => args.filter(Boolean).join(" ");
@@ -274,11 +275,16 @@ export default function About() {
                   id="about-heading"
                   className="text-3xl md:text-4xl font-extrabold"
                 >
-                  About
+                  <GradientTextWave 
+                    text="About" 
+                    colors={['#8B5CF6', '#EC4899', '#06B6D4']}
+                  />
                 </h1>
-                <p className="mt-2 text-sm text-white/70">
-                  My professional journey at a glance.
-                </p>
+                <WordReveal 
+                  text="My professional journey at a glance."
+                  delay={0.5}
+                  className="mt-2 text-sm text-white/70"
+                />
               </Reveal>
             </header>
 
@@ -296,10 +302,17 @@ export default function About() {
                       />
                     </div>
                     <div className="mt-6 text-center">
-                      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent">{person.name}</h2>
-                      <div className="text-sm text-white/70 mt-2 font-medium">
-                        {person.title}
-                      </div>
+                      <h2 className="text-2xl font-bold">
+                        <GradientTextWave 
+                          text={person.name}
+                          colors={['#A78BFA', '#06B6D4', '#10B981']}
+                        />
+                      </h2>
+                      <WordReveal
+                        text={person.title}
+                        delay={0.3}
+                        className="text-sm text-white/70 mt-2 font-medium"
+                      />
 
                       <div className="mt-6 flex flex-col gap-3 w-full">
                         <a
@@ -375,7 +388,12 @@ export default function About() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent">Summary</h3>
+                      <h3 className="text-xl font-bold">
+                        <GradientTextWave 
+                          text="Summary"
+                          colors={['#A78BFA', '#EC4899']}
+                        />
+                      </h3>
                     </div>
                     <p className="text-white/80 leading-relaxed">
                       {person.summary}
@@ -392,7 +410,12 @@ export default function About() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                         </svg>
                       </div>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">Skills</h3>
+                      <h3 className="text-xl font-bold">
+                        <GradientTextWave 
+                          text="Skills"
+                          colors={['#06B6D4', '#10B981']}
+                        />
+                      </h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>

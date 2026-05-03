@@ -17,6 +17,8 @@ import {
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import ThemeToggle from "./ThemeToggle";
+import ThemePicker from "./ThemePicker";
+import MobileThemePicker from "./MobileThemePicker";
 import { useTheme } from "../context/ThemeProvider";
 import logoLight from "../assets/logo.png";
 import logoDark from "../assets/logo_dark.png";
@@ -37,6 +39,42 @@ function usePrefersReducedMotion() {
     };
   }, []);
   return reduced;
+}
+
+/* -------------------- Hook: Scroll Spy -------------------- */
+function useScrollSpy() {
+  const [activeSection, setActiveSection] = useState('');
+  const location = useLocation();
+
+  useEffect(() => {
+    // Only run scroll spy on home page
+    if (location.pathname !== '/') {
+      setActiveSection('');
+      return;
+    }
+
+    const handleScroll = () => {
+      const sections = ['hero', 'about', 'projects', 'skills', 'contact'];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
+
+  return activeSection;
 }
 
 /* -------------------- Custom hook for scroll-reveal -------------------- */
@@ -191,6 +229,7 @@ export default function Navbar() {
   const fmReduced = useReducedMotion();
   const drawerRef = useRef(null);
   const lastActive = useRef(null);
+  const activeSection = useScrollSpy(); // Add scroll spy
 
   // Lightweight non-blocking loader shimmer on first mount
   useEffect(() => {
@@ -544,12 +583,15 @@ export default function Navbar() {
           <div className="flex gap-1">
             {links.map((l) => {
               const isActive = location.pathname === l.to;
+              const isScrollActive = location.pathname === '/' && activeSection === l.to.slice(1);
+              const shouldHighlight = isActive || isScrollActive;
+              
               return (
                 <motion.div key={l.to} className="relative group">
                   <Link
                     to={l.to}
                     className={`relative block px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 overflow-hidden border ${
-                      isActive 
+                      shouldHighlight 
                         ? "text-white bg-gradient-to-r from-purple-600/40 to-teal-400/40 border-purple-500/30 shadow-lg shadow-purple-500/20" 
                         : "text-white/70 hover:text-white border-transparent hover:border-purple-500/20"
                     }`}
@@ -567,7 +609,7 @@ export default function Navbar() {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
                     
                     {/* Active indicator */}
-                    {isActive && (
+                    {shouldHighlight && (
                       <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-purple-400 to-teal-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50" />
                     )}
                     
@@ -582,7 +624,7 @@ export default function Navbar() {
           </div>
 
           <div className="ml-3 mr-3">
-            <ThemeToggle />
+            <ThemePicker />
           </div>
 
           <motion.div 
@@ -616,8 +658,9 @@ export default function Navbar() {
 
         {/* Mobile controls */}
         <div className="md:hidden flex items-center gap-2">
+          {/* Mobile theme picker in navbar */}
           <div className="mr-1">
-            <ThemeToggle className="text-white" />
+            <MobileThemePicker />
           </div>
 
           <ScrollReveal
@@ -923,6 +966,28 @@ export default function Navbar() {
                 </motion.nav>
 
 
+
+                {/* Theme picker in mobile drawer */}
+                <motion.div 
+                  className="pt-4 pb-4 border-t border-b" 
+                  variants={itemVariants}
+                  style={{
+                    borderColor: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: isDark ? '#9ca3af' : '#64748b',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      Themes
+                    </span>
+                  </div>
+                  <MobileThemePicker />
+                </motion.div>
 
                 {/* CTA */}
                 <motion.div 

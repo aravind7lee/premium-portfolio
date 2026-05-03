@@ -7,77 +7,16 @@ import SkillItem from "../components/SkillCard";
 import { SkeletonCard, useSkeletonAsync } from "../components/skeleton";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { revealVariants, staggerContainer, staggerItem, headingVariant } from "../utils/revealVariants";
+import StickyHeader from "../components/StickyHeader";
+import { FiCode } from "react-icons/fi";
+import { WordReveal, LetterStagger, GradientTextWave } from "../components/TypographyAnimations";
 
 /* --------------------
    Config
    -------------------- */
 const ULTRA_SMOOTH = true;
 
-/* --------------------
-   Header Section Component
-   -------------------- */
-const HeaderSection = ({ isLoading, error }) => {
-  const [headerRef, headerVisible] = useScrollReveal({ threshold: 0.1 });
-  const [subtitleRef, subtitleVisible] = useScrollReveal({ threshold: 0.1 });
-  const prefersReducedMotion = usePrefersReducedMotion();
 
-  if (isLoading) {
-    return (
-      <div className="text-center mb-16">
-        <div className="space-y-4">
-          <div className="h-12 bg-gray-300 rounded-lg mx-auto w-64 animate-pulse"></div>
-          <div className="h-6 bg-gray-300 rounded-lg mx-auto w-96 animate-pulse"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center mb-16">
-        <div className="text-red-400">
-          <p>Failed to load skills. Please refresh the page.</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="text-center mb-16">
-      <Motion.div
-        ref={headerRef}
-        variants={headingVariant}
-        initial={prefersReducedMotion ? "visible" : "hidden"}
-        animate="visible"
-        role="status"
-        aria-busy={false}
-      >
-        <h1
-          id="skills-heading"
-          className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-700 via-purple-500 to-teal-600 bg-clip-text text-transparent relative"
-        >
-          <span className="relative inline-block">
-            My Skills
-            <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-teal-400 rounded-full"></span>
-          </span>
-        </h1>
-      </Motion.div>
-
-      <Motion.div
-        ref={subtitleRef}
-        variants={revealVariants}
-        initial={prefersReducedMotion ? "visible" : "hidden"}
-        animate="visible"
-        role="status"
-        aria-busy={false}
-      >
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          Technologies and tools I use to bring ideas to life
-        </p>
-      </Motion.div>
-    </div>
-  );
-};
 
 /* --------------------
    Skills Grid Component
@@ -111,8 +50,13 @@ const SkillsGrid = ({ frontendSkills, backendSkills }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-purple-700 dark:text-purple-300 relative">
-              <span className="relative z-10">Frontend Development</span>
+            <h2 className="text-2xl font-bold relative">
+              <LetterStagger
+                text="Frontend Development"
+                delay={0.2}
+                staggerDelay={0.03}
+                className="text-purple-700 dark:text-purple-300"
+              />
             </h2>
           </div>
 
@@ -163,8 +107,13 @@ const SkillsGrid = ({ frontendSkills, backendSkills }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-teal-700 dark:text-teal-300 relative">
-              <span className="relative z-10">Backend Development</span>
+            <h2 className="text-2xl font-bold relative">
+              <LetterStagger
+                text="Backend Development"
+                delay={0.2}
+                staggerDelay={0.03}
+                className="text-teal-700 dark:text-teal-300"
+              />
             </h2>
           </div>
 
@@ -251,8 +200,12 @@ const ContinuousLearningSection = () => {
           initial="hidden"
           animate={prefersReducedMotion ? "visible" : titleVisible ? "visible" : "hidden"}
         >
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Continuous Learning & Growth
+          <h3 className="text-xl font-semibold mb-4">
+            <GradientTextWave
+              text="Continuous Learning & Growth"
+              colors={['#8B5CF6', '#EC4899', '#06B6D4']}
+              className="text-gray-900 dark:text-white"
+            />
           </h3>
         </Motion.div>
 
@@ -262,12 +215,12 @@ const ContinuousLearningSection = () => {
           initial="hidden"
           animate={prefersReducedMotion ? "visible" : textVisible ? "visible" : "hidden"}
         >
-          <p className="text-gray-700 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            I'm passionate about staying up-to-date with the latest
-            technologies and best practices. These skills represent my
-            current expertise, but I'm always expanding my knowledge
-            through new projects, courses, and hands-on experience.
-          </p>
+          <WordReveal
+            text="I'm passionate about staying up-to-date with the latest technologies and best practices. These skills represent my current expertise, but I'm always expanding my knowledge through new projects, courses, and hands-on experience."
+            delay={0.3}
+            staggerDelay={0.03}
+            className="text-gray-700 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
+          />
         </Motion.div>
 
         <Motion.div
@@ -387,25 +340,37 @@ export default function Skills() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Section */}
-          <HeaderSection isLoading={isLoading} error={error} />
+          {/* STICKY HEADER */}
+          <StickyHeader 
+            title="My Skills" 
+            icon={FiCode}
+            sectionId="skills-section"
+            className="mb-8"
+          />
+
+          {/* Subtitle - Separate container */}
+          <div className="text-center mb-8 sm:mb-12 px-4">
+            <Motion.div
+              variants={revealVariants}
+              initial="hidden"
+              animate="visible"
+              className="glass-modern rounded-xl px-6 py-4 border border-white/10 backdrop-blur-sm max-w-2xl mx-auto"
+            >
+              <WordReveal
+                text="Technologies and tools I use to bring ideas to life"
+                delay={0.3}
+                staggerDelay={0.08}
+                className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed font-medium"
+              />
+            </Motion.div>
+          </div>
+
+          <div id="skills-section">
 
           {isLoading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto skill-grid mt-8">
-              <SkeletonCard
-                height="500px"
-                showImage={false}
-                showText={true}
-                showButton={false}
-                className="rounded-2xl p-8 border bg-white/80 border-gray-200/70 dark:bg-gray-900/70 dark:border-gray-700/50"
-              />
-              <SkeletonCard
-                height="500px"
-                showImage={false}
-                showText={true}
-                showButton={false}
-                className="rounded-2xl p-8 border bg-white/80 border-gray-200/70 dark:bg-gray-900/70 dark:border-gray-700/50"
-              />
+              <div className="h-[500px]"></div>
+              <div className="h-[500px]"></div>
             </div>
           ) : (
             <SkillsGrid frontendSkills={frontendSkills} backendSkills={backendSkills} />
@@ -413,6 +378,7 @@ export default function Skills() {
 
           {/* Continuous Learning Section */}
           <ContinuousLearningSection />
+          </div>
 
           <div
             className="absolute left-[10%] top-[30%] -translate-y-1/2 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl -z-10 ultra-deco ultra-blur"

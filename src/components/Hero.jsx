@@ -5,8 +5,45 @@ import ParticleBackground from "./ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import ResumeButton from "./ResumeButton";
 import { FiMail } from "react-icons/fi";
-import Profile1 from "../assets/Profile1.jpg"; // ensure path is correct
-// Skeleton imports removed to fix Hero display issue
+import Profile1 from "../assets/Profile1.jpg";
+import { useToast } from "./Toast";
+import { Typewriter, LetterStagger, GradientTextWave } from "./TypographyAnimations";
+
+/**
+ * CounterAnimation - Counts up from 0 to target
+ */
+function CounterAnimation({ target, duration = 2000, suffix = '', className = '' }) {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const startTime = Date.now();
+          const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            setCount(Math.floor(easeOutQuart * target));
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          };
+          animate();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target, duration, hasAnimated]);
+
+  return <span ref={ref} className={className}>{count}{suffix}</span>;
+}
 
 /**
  * useScrollReveal - lightweight IntersectionObserver hook
@@ -94,6 +131,85 @@ const imageWrapVariant = {
 export default function Hero() {
   const reduce = usePrefersReducedMotion();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const toast = useToast();
+  
+  // PARALLAX SCROLL EFFECT
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  // MAGNETIC EFFECT STATE
+  const downloadBtnRef = useRef(null);
+  const mailBtnRef = useRef(null);
+  const [downloadPos, setDownloadPos] = useState({ x: 0, y: 0 });
+  const [mailPos, setMailPos] = useState({ x: 0, y: 0 });
+
+  // MAGNETIC EFFECT FOR DOWNLOAD BUTTON
+  useEffect(() => {
+    const btn = downloadBtnRef.current;
+    if (!btn) return;
+
+    const handleMouseMove = (e) => {
+      const rect = btn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - centerX;
+      const deltaY = e.clientY - centerY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance < 150) {
+        setDownloadPos({ x: deltaX * 0.3, y: deltaY * 0.3 });
+      } else {
+        setDownloadPos({ x: 0, y: 0 });
+      }
+    };
+
+    const handleMouseLeave = () => setDownloadPos({ x: 0, y: 0 });
+
+    btn.addEventListener('mousemove', handleMouseMove);
+    btn.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      btn.removeEventListener('mousemove', handleMouseMove);
+      btn.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
+
+  // MAGNETIC EFFECT FOR MAIL BUTTON
+  useEffect(() => {
+    const btn = mailBtnRef.current;
+    if (!btn) return;
+
+    const handleMouseMove = (e) => {
+      const rect = btn.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const deltaX = e.clientX - centerX;
+      const deltaY = e.clientY - centerY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance < 150) {
+        setMailPos({ x: deltaX * 0.3, y: deltaY * 0.3 });
+      } else {
+        setMailPos({ x: 0, y: 0 });
+      }
+    };
+
+    const handleMouseLeave = () => setMailPos({ x: 0, y: 0 });
+
+    btn.addEventListener('mousemove', handleMouseMove);
+    btn.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      btn.removeEventListener('mousemove', handleMouseMove);
+      btn.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
 
   // For now, let's disable the skeleton loading in Hero to fix the display issue
   // The skeleton loading can be re-enabled later if needed
@@ -164,12 +280,34 @@ export default function Hero() {
     // pt-[120px] prevents overlap with a fixed navbar on mobile (adjust to match your layout)
     <section
       aria-label="Hero"
-      className="relative min-h-[70vh] md:min-h-[85vh] flex items-start md:items-center pt-[120px] md:pt-0 pb-6 md:pb-8"
+      className="relative min-h-[70vh] md:min-h-[85vh] flex items-start md:items-center pt-[120px] md:pt-0 pb-6 md:pb-8 overflow-hidden"
     >
-      {/* Particle background (unchanged) */}
-      <div className="absolute inset-0 -z-10">
+      {/* Particle background with PARALLAX */}
+      <div 
+        className="absolute inset-0 -z-10"
+        style={{
+          transform: `translateY(${scrollY * 0.5}px)`,
+          transition: 'transform 0.1s ease-out',
+        }}
+      >
         <ParticleBackground />
       </div>
+
+      {/* Parallax gradient orbs */}
+      <div 
+        className="absolute top-20 left-10 w-96 h-96 rounded-full bg-purple-600/20 blur-3xl"
+        style={{
+          transform: `translate(${scrollY * 0.3}px, ${scrollY * 0.2}px)`,
+          transition: 'transform 0.1s ease-out',
+        }}
+      />
+      <div 
+        className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-teal-400/20 blur-3xl"
+        style={{
+          transform: `translate(${-scrollY * 0.2}px, ${scrollY * 0.3}px)`,
+          transition: 'transform 0.1s ease-out',
+        }}
+      />
 
       <div className="max-w-6xl mx-auto px-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start md:items-center">
@@ -196,28 +334,25 @@ export default function Hero() {
               <span className="text-sm font-medium text-white/90">Available for opportunities</span>
             </Motion.div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight">
-              I build{" "}
-              <span className="relative inline-block">
-                <span className="text-gradient-animate">
-                  premium
-                </span>
-                <Motion.span
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-teal-400 rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
-                />
-              </span>{" "}
-              interactive web experiences.
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.2] max-w-4xl" style={{ wordBreak: 'keep-all', overflowWrap: 'normal', whiteSpace: 'normal' }}>
+              <LetterStagger text="I build premium" delay={0} className="block" />
+              <GradientTextWave text="interactive web experiences." className="block" />
             </h1>
 
-            <p className="text-base md:text-lg text-white/80 max-w-xl mx-auto md:mx-0 leading-relaxed">
-              {heroData?.content?.description ||
-                "Crafting modern digital experiences with React, Node.js, and TailwindCSS. Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions"}
-            </p>
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5, duration: 0.8 }}
+            >
+              <Typewriter
+                text={heroData?.content?.description || "Crafting modern digital experiences with React, Node.js, and TailwindCSS. Specializing in responsive web applications that blend front-end elegance with back-end robustness, transforming ideas into high-performance solutions"}
+                delay={1800}
+                speed={20}
+                className="text-base md:text-lg text-white/80 max-w-xl mx-auto md:mx-0 leading-relaxed block"
+              />
+            </Motion.div>
 
-            {/* Stats row */}
+            {/* Stats row with COUNTER ANIMATION */}
             <Motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -226,7 +361,7 @@ export default function Hero() {
             >
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 flex items-center justify-center">
-                  <span className="text-lg font-bold text-purple-400">8+</span>
+                  <CounterAnimation target={8} duration={2000} suffix="+" className="text-lg font-bold text-purple-400" />
                 </div>
                 <div className="text-left">
                   <div className="text-xs text-white/60">Projects</div>
@@ -236,64 +371,107 @@ export default function Hero() {
             </Motion.div>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center md:justify-start">
-              {/* Resume Download Button */}
-              <Motion.button
-                onClick={() => {
-                  setIsDownloading(true);
-                  setTimeout(() => {
-                    setIsDownloading(false);
-                    const a = document.createElement('a');
-                    a.href = '/Aravind R-Updated-Resume.pdf';
-                    a.download = 'Aravind R-Updated-Resume.pdf';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                  }, 2000);
-                }}
-                disabled={isDownloading}
-                className="relative group w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 active:scale-95 sm:hover:scale-105 overflow-hidden touch-manipulation disabled:opacity-80 btn-magnetic"
-                aria-label="Download resume"
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="relative z-10 flex items-center justify-center min-h-[24px] gap-2">
-                  {isDownloading ? (
-                    <>
-                      <Motion.div
-                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      />
-                      <span className="text-sm sm:text-base">Preparing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span className="text-sm sm:text-base">Download Resume</span>
-                    </>
-                  )}
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              </Motion.button>
+              {/* Resume Download Button WITH MAGNETIC + RIPPLE */}
+              <div ref={downloadBtnRef} className="inline-block">
+                <Motion.button
+                  onClick={(e) => {
+                    // RIPPLE EFFECT
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255,255,255,0.5)';
+                    ripple.style.width = '400px';
+                    ripple.style.height = '400px';
+                    ripple.style.left = (e.clientX - rect.left - 200) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - 200) + 'px';
+                    ripple.style.animation = 'ripple 0.6s ease-out';
+                    ripple.style.pointerEvents = 'none';
+                    e.currentTarget.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                    
+                    // DOWNLOAD LOGIC
+                    setIsDownloading(true);
+                    toast.info('Preparing your resume...');
+                    setTimeout(() => {
+                      setIsDownloading(false);
+                      const a = document.createElement('a');
+                      a.href = '/Aravind R-Updated-Resume.pdf';
+                      a.download = 'Aravind R-Updated-Resume.pdf';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      toast.success('Resume downloaded successfully!');
+                    }, 2000);
+                  }}
+                  disabled={isDownloading}
+                  animate={{ x: downloadPos.x, y: downloadPos.y }}
+                  transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+                  className="relative group w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-teal-400 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/30 overflow-hidden touch-manipulation disabled:opacity-80"
+                  aria-label="Download resume"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="relative z-10 flex items-center justify-center min-h-[24px] gap-2">
+                    {isDownloading ? (
+                      <>
+                        <Motion.div
+                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        />
+                        <span className="text-sm sm:text-base">Preparing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span className="text-sm sm:text-base">Download Resume</span>
+                      </>
+                    )}
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                </Motion.button>
+              </div>
 
-              {/* Mail Me Button */}
-              <Motion.a
-                href={mailtoHref}
-                onClick={handleMailClick}
-                className="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl glass-modern border border-white/20 transition-all duration-300 hover:border-purple-500/50 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 active:scale-95 sm:hover:scale-105 overflow-hidden touch-manipulation"
-                aria-label="Send me an email"
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  <FiMail className="text-base sm:text-lg transition-transform duration-300 group-hover:rotate-12" /> 
-                  <span className="text-sm sm:text-base font-medium">Mail Me</span>
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </Motion.a>
+              {/* Mail Me Button WITH MAGNETIC + RIPPLE */}
+              <div ref={mailBtnRef} className="inline-block">
+                <Motion.a
+                  href={mailtoHref}
+                  onClick={(e) => {
+                    // RIPPLE EFFECT
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255,255,255,0.5)';
+                    ripple.style.width = '400px';
+                    ripple.style.height = '400px';
+                    ripple.style.left = (e.clientX - rect.left - 200) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - 200) + 'px';
+                    ripple.style.animation = 'ripple 0.6s ease-out';
+                    ripple.style.pointerEvents = 'none';
+                    e.currentTarget.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                    
+                    handleMailClick(e);
+                  }}
+                  animate={{ x: mailPos.x, y: mailPos.y }}
+                  transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+                  className="relative group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl glass-modern border border-white/20 transition-all duration-300 hover:border-purple-500/50 hover:bg-white/10 hover:shadow-xl hover:shadow-teal-500/20 overflow-hidden touch-manipulation"
+                  aria-label="Send me an email"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <FiMail className="text-base sm:text-lg transition-transform duration-300 group-hover:rotate-12" /> 
+                    <span className="text-sm sm:text-base font-medium">Mail Me</span>
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Motion.a>
+              </div>
             </div>
 
             <div className="mt-6">

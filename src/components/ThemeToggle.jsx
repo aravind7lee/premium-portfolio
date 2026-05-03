@@ -1,166 +1,140 @@
 // src/components/ThemeToggle.jsx
-import React, { useMemo, useRef } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useReducedMotion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { FiSun, FiMoon } from "react-icons/fi";
-import { useTheme } from "../context/ThemeProvider";
+import React, { useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion, useMotionValue, useSpring } from 'framer-motion';
+import { FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from '../context/ThemeProvider';
 
-// Ultra-smooth theme toggle: GPU-accelerated, spring-based, no layout thrash
-function ThemeToggleImpl({ className = "" }) {
-  const { theme, cycleTheme, isDark } = useTheme();
-  const prefersReduced = useReducedMotion();
+// Compact theme toggle for mobile navigation
+function ThemeToggleImpl({ className = '' }) {
+  const { isDark, cycleTheme, currentTheme, isTransitioning } = useTheme();
+  const reduced = useReducedMotion();
+  const isToggling = useRef(false);
 
-  // motion values avoid re-layout and re-render on every frame
+  // Smooth knob animation
   const x = useMotionValue(isDark ? 28 : 0);
-  const xSpring = useSpring(x, {
-    stiffness: prefersReduced ? 1000 : 780,
-    damping: prefersReduced ? 50 : 32,
-    mass: 0.9,
+  const xSpring = useSpring(x, { 
+    stiffness: reduced ? 1000 : 600, 
+    damping: reduced ? 50 : 30, 
+    mass: 0.8 
   });
-  const rotate = useTransform(xSpring, [0, 28], [0, 180]);
 
-  // update target when theme changes
-  React.useEffect(() => {
-    const targetX = isDark ? 28 : 0;
-    x.set(targetX);
+  React.useEffect(() => { 
+    x.set(isDark ? 28 : 0); 
   }, [isDark, x]);
 
-  // Optimistic, snappy interaction
-  const isToggling = useRef(false);
   const onToggle = () => {
     if (isToggling.current) return;
     isToggling.current = true;
-    
-    // Toggle the theme immediately
     cycleTheme();
-    
-    // Allow another toggle after animation
-    setTimeout(() => (isToggling.current = false), prefersReduced ? 50 : 200);
+    setTimeout(() => (isToggling.current = false), reduced ? 50 : 300);
   };
 
-  const bg = useMemo(
-    () =>
-      isDark
-        ? "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))"
-        : "linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.03))",
-    [isDark]
-  );
+  const accentPrimary = currentTheme?.vars?.['--accent-primary'] || '#6366f1';
+  const accentSecondary = currentTheme?.vars?.['--accent-secondary'] || '#8b5cf6';
 
   return (
     <button
       onClick={onToggle}
       type="button"
-      aria-label={`Toggle theme, current: ${theme}`}
+      aria-label={`Toggle theme, current: ${currentTheme?.label || (isDark ? 'dark' : 'light')}`}
       aria-pressed={isDark}
       role="switch"
-      title={`Theme: ${theme}`}
       className={`inline-flex items-center ${className}`}
+      disabled={isTransitioning}
     >
       <div
-        className="w-16 h-9 rounded-full p-1 cursor-pointer select-none relative"
+        className="w-16 h-9 rounded-full p-1 cursor-pointer select-none relative overflow-hidden"
         style={{
-          background: bg,
-          border: "1px solid rgba(255,255,255,0.06)",
-          WebkitTapHighlightColor: "transparent",
-          willChange: "transform",
-          transform: "translateZ(0)",
+          background: isDark
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))'
+            : 'linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.04))',
+          border: '1px solid var(--glass-border)',
+          WebkitTapHighlightColor: 'transparent',
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        {/* Trail glow */}
-        {!prefersReduced && (
-          <motion.span
+        {/* Background glow */}
+        {!reduced && (
+          <motion.div
+            className="absolute inset-0 rounded-full"
             style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: 999,
               background: isDark
-                ? "radial-gradient(600px circle at 20% 50%, rgba(159,122,234,0.15), transparent 40%)"
-                : "radial-gradient(600px circle at 80% 50%, rgba(6,182,212,0.16), transparent 40%)",
-              filter: "blur(4px)",
+                ? `radial-gradient(600px circle at 20% 50%, ${accentPrimary}20, transparent 40%)`
+                : `radial-gradient(600px circle at 80% 50%, ${accentPrimary}25, transparent 40%)`,
+              filter: 'blur(6px)',
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.4 }}
           />
         )}
 
+        {/* Track gradient */}
+        <div 
+          className="absolute inset-1 rounded-full"
+          style={{
+            background: isDark
+              ? `linear-gradient(90deg, ${accentSecondary}15, ${accentPrimary}20)`
+              : `linear-gradient(90deg, ${accentPrimary}10, ${accentSecondary}15)`,
+            opacity: 0.6,
+          }}
+        />
+
         {/* Knob */}
         <motion.div
-          initial={false}
           style={{ x: xSpring }}
-          whileTap={prefersReduced ? undefined : { scale: 0.97 }}
-          className="w-7 h-7 rounded-full shadow-sm flex items-center justify-center absolute top-1 left-1"
-          animate={{ 
-            backgroundColor: isDark ? "#0b1220" : "#ffffff",
-            transition: { duration: prefersReduced ? 0 : 0.2 }
+          whileTap={reduced ? undefined : { scale: 0.95 }}
+          className="w-7 h-7 rounded-full shadow-lg flex items-center justify-center absolute top-1 left-1 z-10"
+          animate={{
+            backgroundColor: isDark ? 'var(--bg-secondary)' : '#ffffff',
+            boxShadow: isDark 
+              ? `0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px ${accentPrimary}30`
+              : `0 4px 12px rgba(0,0,0,0.15), 0 0 0 1px ${accentPrimary}20`,
+            transition: { duration: reduced ? 0 : 0.3 },
           }}
         >
-          {/* Only one icon is mounted; crossfade/scale on switch */}
+          {/* Icon transition */}
           <AnimatePresence initial={false} mode="wait">
             {isDark ? (
-              <motion.span
+              <motion.span 
                 key="moon"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                initial={
-                  prefersReduced
-                    ? { opacity: 1, scale: 1 }
-                    : { opacity: 0, scale: 0.9, rotate: -20 }
-                }
-                animate={
-                  prefersReduced
-                    ? { opacity: 1, scale: 1 }
-                    : { opacity: 1, scale: 1, rotate: 0 }
-                }
-                exit={
-                  prefersReduced
-                    ? { opacity: 1 }
-                    : { opacity: 0, scale: 0.9, rotate: 20 }
-                }
-                transition={{ duration: prefersReduced ? 0 : 0.18 }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                initial={reduced ? { opacity: 1 } : { opacity: 0, scale: 0.8, rotate: -30 }}
+                animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, rotate: 0 }}
+                exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.8, rotate: 30 }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: 'easeOut' }}
               >
-                <FiMoon size={16} color="#8E37EB" />
+                <FiMoon size={14} color={accentPrimary} strokeWidth={2.5} />
               </motion.span>
             ) : (
-              <motion.span
+              <motion.span 
                 key="sun"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  rotate,
-                }}
-                initial={
-                  prefersReduced
-                    ? { opacity: 1, scale: 1 }
-                    : { opacity: 0, scale: 0.9, rotate: 20 }
-                }
-                animate={
-                  prefersReduced
-                    ? { opacity: 1, scale: 1 }
-                    : { opacity: 1, scale: 1, rotate: 0 }
-                }
-                exit={
-                  prefersReduced
-                    ? { opacity: 1 }
-                    : { opacity: 0, scale: 0.9, rotate: -20 }
-                }
-                transition={{ duration: prefersReduced ? 0 : 0.18 }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                initial={reduced ? { opacity: 1 } : { opacity: 0, scale: 0.8, rotate: 30 }}
+                animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, rotate: 0 }}
+                exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.8, rotate: -30 }}
+                transition={{ duration: reduced ? 0 : 0.25, ease: 'easeOut' }}
               >
-                <FiSun size={16} color="#111827" />
+                <FiSun size={14} color="#f59e0b" strokeWidth={2.5} />
               </motion.span>
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* Transition ripple */}
+        {isTransitioning && !reduced && (
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            initial={{ scale: 0.8, opacity: 0.6 }}
+            animate={{ scale: 1.2, opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            style={{ 
+              background: `radial-gradient(circle, ${accentPrimary}40, transparent 70%)`,
+            }}
+          />
+        )}
       </div>
     </button>
   );

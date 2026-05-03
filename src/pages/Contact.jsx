@@ -1,11 +1,12 @@
 // src/pages/Contact.jsx
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { motion } from "framer-motion"; // keep only for small top-level mount
-import ContactForm from "../components/ContactForm";
+import { motion } from "framer-motion";
+import PremiumContactForm from "../components/PremiumContactForm";
 import ParticleBackground from "../components/ParticleBackground";
 import usePrefersReducedMotion from "../hooks/usePrefersReducedMotion";
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 import { SkeletonCard, useSkeletonAsync } from "../components/skeleton";
+import { GradientTextWave, WordReveal } from "../components/TypographyAnimations";
 
 /* -----------------------
    Config: Ultra-smooth forced ON
@@ -434,14 +435,19 @@ export default function Contact() {
                     <div>
                       <h1
                         id="contact-heading"
-                        className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent"
+                        className="text-3xl md:text-4xl font-extrabold"
                       >
-                        Contact
+                        <GradientTextWave
+                          text="Contact"
+                          colors={['#A78BFA', '#EC4899', '#06B6D4']}
+                        />
                       </h1>
-                      <p className="mt-1 text-sm text-white/80 max-w-xl">
-                        Have a question, collaboration idea, or want to say hi? Drop
-                        a message.
-                      </p>
+                      <WordReveal
+                        text="Have a question, collaboration idea, or want to say hi? Drop a message."
+                        delay={0.3}
+                        staggerDelay={0.05}
+                        className="mt-1 text-sm text-white/80 max-w-xl"
+                      />
                     </div>
                   </div>
                 </Reveal>
@@ -452,8 +458,7 @@ export default function Contact() {
                 {/* Left: Contact form */}
                 <Reveal variant="fade-up" delay={0.12}>
                   <div className="w-full h-full card-smooth">
-                    {/* contact form should be optimized inside component: avoid heavy animation in ContactForm */}
-                    <ContactForm />
+                    <PremiumContactForm />
                   </div>
                 </Reveal>
 
@@ -467,8 +472,11 @@ export default function Contact() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
-                        <h2 className="text-lg font-semibold bg-gradient-to-r from-teal-400 to-purple-400 bg-clip-text text-transparent">
-                          Contact details
+                        <h2 className="text-lg font-semibold">
+                          <GradientTextWave
+                            text="Contact details"
+                            colors={['#06B6D4', '#A78BFA']}
+                          />
                         </h2>
                       </div>
                       <div className="space-y-3 text-sm">
@@ -523,7 +531,12 @@ export default function Contact() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
-                        <h3 className="font-semibold bg-gradient-to-r from-purple-400 to-teal-400 bg-clip-text text-transparent">Availability</h3>
+                        <h3 className="font-semibold">
+                          <GradientTextWave
+                            text="Availability"
+                            colors={['#A78BFA', '#06B6D4']}
+                          />
+                        </h3>
                       </div>
                       <p className="mt-2 text-sm text-white/80">
                         Open to full-time and contract opportunities. Available
@@ -539,7 +552,12 @@ export default function Contact() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                           </svg>
                         </div>
-                        <h3 className="font-semibold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Quick links</h3>
+                        <h3 className="font-semibold">
+                          <GradientTextWave
+                            text="Quick links"
+                            colors={['#EC4899', '#A78BFA']}
+                          />
+                        </h3>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         <a

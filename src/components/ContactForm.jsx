@@ -4,6 +4,8 @@ import { motion as Motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { FiUser, FiMail, FiTag, FiSend, FiCheck, FiCopy } from "react-icons/fi";
 import { useTheme } from "../context/ThemeProvider";
+import { useToast } from "./Toast";
+import LoadingSpinner from "./LoadingSpinner";
 
 /**
  * Responsive, mobile-first, accessible ContactForm.
@@ -16,11 +18,12 @@ const WEB3FORMS_ACCESS_KEY = "5d71368d-2672-4f5c-91e1-dbb7cc66c8b3";
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
 export default function ContactForm() {
-  const [status, setStatus] = React.useState("idle"); // idle | loading | success | error
+  const [status, setStatus] = React.useState("idle");
   const [copied, setCopied] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const textareaRef = React.useRef(null);
   const { isDark } = useTheme();
+  const toast = useToast();
 
   // auto-resize textarea
   React.useEffect(() => {
@@ -91,6 +94,7 @@ export default function ContactForm() {
       ) {
         setStatus("success");
         form.reset();
+        toast.success('Message sent successfully! I\'ll get back to you soon.');
 
         // small confetti
         try {
@@ -105,12 +109,16 @@ export default function ContactForm() {
       } else {
         console.error("Web3Forms error:", body);
         setStatus("error");
-        setErrorMessage(body?.message || "Failed to send message.");
+        const msg = body?.message || "Failed to send message.";
+        setErrorMessage(msg);
+        toast.error(msg);
       }
     } catch (err) {
       console.error("Network error:", err);
       setStatus("error");
-      setErrorMessage("Network error, please try again.");
+      const msg = "Network error, please try again.";
+      setErrorMessage(msg);
+      toast.error(msg);
     }
   };
 
@@ -118,6 +126,7 @@ export default function ContactForm() {
     try {
       await navigator.clipboard.writeText(DEST_EMAIL);
       setCopied(true);
+      toast.success('Email copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("copy failed", err);
@@ -221,9 +230,9 @@ export default function ContactForm() {
           }}
         >
           <div className="flex flex-col items-center gap-3">
-            <Spinner />
+            <LoadingSpinner size="lg" variant="gradient" />
             <div
-              className="text-sm"
+              className="text-sm font-medium"
               style={{
                 color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)",
               }}

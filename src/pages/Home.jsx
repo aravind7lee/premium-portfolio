@@ -325,14 +325,14 @@ export default function Home() {
           initial="hidden"
           animate={animState(projectsVisible)}
           id="projects"
-          className="max-w-6xl mx-auto px-6 mt-16 md:mt-20 mb-20"
+          className="max-w-6xl mx-auto px-4 sm:px-6 mt-12 sm:mt-16 md:mt-20 mb-16 sm:mb-20"
           aria-label="Featured projects"
         >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Featured Projects</h2>
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">Featured Projects</h2>
             <button
               onClick={openProjects}
-              className="text-sm text-white/70 hover:text-white transition-colors"
+              className="text-sm text-white/70 hover:text-white transition-colors px-3 py-1 rounded-lg hover:bg-white/5"
             >
               See all
             </button>
@@ -371,11 +371,11 @@ export default function Home() {
           variants={reduce ? {} : variants.fadeUp}
           initial="hidden"
           animate={animState(aboutVisible)}
-          className="max-w-6xl mx-auto px-6 my-24"
+          className="max-w-6xl mx-auto px-4 sm:px-6 my-16 sm:my-20 md:my-24"
           aria-label="About me"
         >
           {aboutLoading ? (
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               {/* About text skeleton */}
               <div className="space-y-6">
                 <SkeletonText lines={1} lineHeight="2.5rem" className="mb-6" />
@@ -398,30 +398,33 @@ export default function Home() {
               Failed to load about section. Please refresh the page.
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               {/* About text */}
               <Motion.div 
                 ref={aboutTextRef}
                 variants={reduce ? {} : variants.fadeUp}
                 initial={reduce ? "visible" : "hidden"}
                 animate={reduce ? "visible" : aboutTextVisible ? "visible" : "visible"}
+                className="order-1 lg:order-1"
                 style={{ willChange: "transform, opacity" }}
               >
-                <h3 className="text-2xl md:text-3xl mb-6 font-bold bg-clip-text">About Me</h3>
-                <p className="mt-3 text-white/80 text-lg leading-relaxed">
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl mb-4 sm:mb-6 font-bold text-white leading-tight">
+                  About Me
+                </h3>
+                <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8">
                   I'm a passionate developer who builds production-ready applications with a focus on exceptional UX, performance,
                   and beautiful animations. I prioritize accessible, maintainable code complemented by engaging microinteractions.
                 </p>
 
                 <Motion.div
-                  className="mt-8"
-                  whileHover={reduce ? {} : { scale: 1.01 }}
+                  className="inline-block"
+                  whileHover={reduce ? {} : { scale: 1.02 }}
                   whileTap={reduce ? {} : { scale: 0.98 }}
                   style={{ willChange: "transform" }}
                 >
                   <button
                     onClick={() => navigate("/about")}
-                    className="px-6 py-3 rounded-lg glass transition-all duration-300 hover:shadow-lg flex items-center group"
+                    className="inline-flex items-center px-6 py-3 rounded-xl glass transition-all duration-300 hover:shadow-lg group text-white font-medium"
                     aria-label="Learn more about me"
                   >
                     Learn more
@@ -443,49 +446,68 @@ export default function Home() {
                 variants={reduce ? {} : variants.slideInRight}
                 initial={reduce ? "visible" : "hidden"}
                 animate={reduce ? "visible" : educationVisible ? "visible" : "visible"}
-                className="glass rounded-xl p-8 backdrop-blur-lg"
+                className="order-2 lg:order-2 glass rounded-2xl p-6 sm:p-8 backdrop-blur-lg"
                 style={{ willChange: "transform, opacity" }}
               >
                 {/* Section Heading */}
-                <h4 className="font-bold text-2xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Education</h4>
+                <h4 className="font-bold text-xl sm:text-2xl mb-6 text-white flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-sm">🎓</span>
+                  Education
+                </h4>
 
                 {/* Education List */}
-                <Motion.ul 
+                <Motion.div 
                   variants={reduce ? {} : variants.staggerParent}
                   initial={reduce ? "visible" : "hidden"}
                   animate={reduce ? "visible" : educationVisible ? "visible" : "visible"}
-                  className="space-y-8"
+                  className="space-y-6"
                 >
                   {/* MCA */}
-                  <Motion.li 
+                  <Motion.div 
                     variants={reduce ? {} : variants.fadeIn} 
-                    className="relative pl-8 border-l-2 border-white/20"
+                    className="relative pl-6 border-l-2 border-blue-500/30"
                     style={{ willChange: "transform, opacity" }}
                   >
-                    <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-md shadow-blue-500/40"></div>
+                    <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg shadow-blue-500/40"></div>
 
-                    <strong className="block text-lg font-semibold text-white">Master of Computer Application (MCA)</strong>
-
-                    <span className="block text-white/80 italic">SRM Institute of Science and Technology, Chennai</span>
-
-                    <p className="mt-1 text-white/70">2023 – 2025 • <span className="font-medium">CGPA: 9.73</span></p>
-                  </Motion.li>
+                    <div className="space-y-1">
+                      <h5 className="text-base sm:text-lg font-semibold text-white leading-tight">
+                        Master of Computer Application (MCA)
+                      </h5>
+                      <p className="text-white/70 text-sm sm:text-base italic">
+                        SRM Institute of Science and Technology, Chennai
+                      </p>
+                      <p className="text-white/60 text-sm flex flex-wrap items-center gap-2">
+                        <span>2023 – 2025</span>
+                        <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+                        <span className="font-medium text-green-400">CGPA: 9.73</span>
+                      </p>
+                    </div>
+                  </Motion.div>
 
                   {/* BCA */}
-                  <Motion.li 
+                  <Motion.div 
                     variants={reduce ? {} : variants.fadeIn} 
-                    className="relative pl-8 border-l-2 border-white/20"
+                    className="relative pl-6 border-l-2 border-pink-500/30"
                     style={{ willChange: "transform, opacity" }}
                   >
-                    <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-pink-500 to-red-500 shadow-md shadow-pink-500/40"></div>
+                    <div className="absolute -left-2.5 top-1 w-4 h-4 rounded-full bg-gradient-to-r from-pink-500 to-red-500 shadow-lg shadow-pink-500/40"></div>
 
-                    <strong className="block text-lg font-semibold text-white">Bachelor of Computer Application (BCA)</strong>
-
-                    <span className="block text-white/80 italic">SRM Institute of Science and Technology, Chennai</span>
-
-                    <p className="mt-1 text-white/70">2020 – 2023 • <span className="font-medium">CGPA: 9.30</span></p>
-                  </Motion.li>
-                </Motion.ul>
+                    <div className="space-y-1">
+                      <h5 className="text-base sm:text-lg font-semibold text-white leading-tight">
+                        Bachelor of Computer Application (BCA)
+                      </h5>
+                      <p className="text-white/70 text-sm sm:text-base italic">
+                        SRM Institute of Science and Technology, Chennai
+                      </p>
+                      <p className="text-white/60 text-sm flex flex-wrap items-center gap-2">
+                        <span>2020 – 2023</span>
+                        <span className="w-1 h-1 bg-white/40 rounded-full"></span>
+                        <span className="font-medium text-green-400">CGPA: 9.30</span>
+                      </p>
+                    </div>
+                  </Motion.div>
+                </Motion.div>
               </Motion.div>
             </div>
           )}
@@ -497,7 +519,7 @@ export default function Home() {
           variants={reduce ? {} : variants.fadeUp}
           initial="hidden"
           animate={animState(ctaVisible)}
-          className="max-w-6xl mx-auto px-6 my-16"
+          className="max-w-6xl mx-auto px-4 sm:px-6 my-12 sm:my-16 md:my-20"
         >
           {ctaLoading ? (
             <SkeletonCard 
